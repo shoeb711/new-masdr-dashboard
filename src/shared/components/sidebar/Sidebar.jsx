@@ -1,7 +1,7 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { PATH } from "shared/constant";
 
 const navigation = [
@@ -23,6 +23,8 @@ function classNames(...classes) {
 }
 
 const Sidebar = () => {
+  const location = useLocation();
+
   return (
     <div>
       {/* Static sidebar for desktop */}
