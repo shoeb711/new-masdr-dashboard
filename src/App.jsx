@@ -1,7 +1,22 @@
+import RootLayout from "layout/rootLayout/RootLayout";
+import { Suspense } from "react";
+import { Route, Routes } from "react-router-dom";
+
 function App() {
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Vite + React</h1>
+      <Routes>
+        <Route
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <RootLayout />
+            </Suspense>
+          }
+        >
+          <Route path="/" element={<div>Dashboard</div>} />
+          <Route path="/querybuilder" element={<div>Query Builder</div>} />
+        </Route>
+      </Routes>
     </>
   );
 }
