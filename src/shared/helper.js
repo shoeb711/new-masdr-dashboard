@@ -14,15 +14,6 @@ export const options = {
       },
     },
   },
-  dataLabels: {
-    enabled: true,
-    offsetY: -20,
-    style: {
-      fontSize: "12px",
-      colors: ["#304758"],
-    },
-  },
-
   xaxis: {
     categories: [
       "Jan",
@@ -38,7 +29,7 @@ export const options = {
       "Nov",
       "Dec",
     ],
-    position: "top",
+    position: "bottom",
     axisBorder: {
       show: false,
     },

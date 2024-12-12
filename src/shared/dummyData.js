@@ -1,7 +1,7 @@
 export const dummyData = [
   {
     title: "Performance",
-    type: "bar",
+    type: "line",
     data: [
       [
         {
@@ -39,6 +39,14 @@ export const dummyData = [
           data: [150, 210, 330, 800, 300, 256, 200, 180, 100, 60, 40, 10],
         },
       ],
+    ],
+  },
+  {
+    title: "Revenue Revenue",
+    type: "pie",
+    data: [
+      [200, 310, 400, 1001, 400, 306, 302, 230, 140, 80, 50, 20],
+      [150, 210, 330, 800, 300, 256, 200, 180, 100, 60, 40, 10],
     ],
   },
 ];
