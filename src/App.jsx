@@ -1,5 +1,6 @@
 import Auth from "components/Auth";
 import RootLayout from "layout/rootLayout/RootLayout";
+import Dashboard from "pages/dashboard/Dashboard";
 import { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
@@ -27,7 +28,7 @@ function App() {
               />
             }
           >
-            <Route path="/" element={<div>Dashboard</div>} />
+            <Route path="/" element={<Dashboard />} />
           </Route>
           <Route
             element={
