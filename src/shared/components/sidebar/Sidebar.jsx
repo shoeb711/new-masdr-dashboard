@@ -2,15 +2,20 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "react-router-dom";
-import { PATH } from "shared/constant";
+import { PATH, userRole } from "shared/constant";
 
 const navigation = [
-  { name: "Dashboard", href: PATH.dashboard, icon: HomeIcon, current: true },
+  {
+    name: "Dashboard",
+    href: PATH.dashboard,
+    icon: HomeIcon,
+    role: [userRole.ADMIN, userRole.SUPER_ADMIN, userRole.USER],
+  },
   {
     name: "Query Builder",
     href: PATH.queryBuilder,
     icon: UsersIcon,
-    current: false,
+    role: [userRole.ADMIN, userRole.SUPER_ADMIN],
   },
 ];
 const userNavigation = [
@@ -24,6 +29,8 @@ function classNames(...classes) {
 
 const Sidebar = () => {
   const location = useLocation();
+
+  const currentUserRole = localStorage.getItem("role");
 
   return (
     <div>
@@ -42,33 +49,38 @@ const Sidebar = () => {
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
-                  {navigation.map((item) => {
-                    const isActive = item.href === location.pathname;
-                    return (
-                      <li key={item.name}>
-                        <Link
-                          to={item.href}
-                          className={classNames(
-                            isActive
-                              ? "bg-gray-50 text-indigo-600"
-                              : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
-                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
-                          )}
-                        >
-                          <item.icon
-                            aria-hidden="true"
+                  {navigation
+                    .filter(
+                      (item) => item.role.includes(currentUserRole) // Check role-based access
+                    )
+                    .map((item) => {
+                      const isActive = item.href === location.pathname;
+
+                      return (
+                        <li key={item.name}>
+                          <Link
+                            to={item.href}
                             className={classNames(
                               isActive
-                                ? "text-indigo-600"
-                                : "text-gray-400 group-hover:text-indigo-600",
-                              "size-6 shrink-0"
+                                ? "bg-gray-50 text-indigo-600"
+                                : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
+                              "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                             )}
-                          />
-                          {item.name}
-                        </Link>
-                      </li>
-                    );
-                  })}
+                          >
+                            <item.icon
+                              aria-hidden="true"
+                              className={classNames(
+                                isActive
+                                  ? "text-indigo-600"
+                                  : "text-gray-400 group-hover:text-indigo-600",
+                                "size-6 shrink-0"
+                              )}
+                            />
+                            {item.name}
+                          </Link>
+                        </li>
+                      );
+                    })}
                 </ul>
               </li>
             </ul>

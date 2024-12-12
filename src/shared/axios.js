@@ -7,7 +7,7 @@ export const masdrDevApi = axios.create({
 // Setting up interceptors
 masdrDevApi.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token"); //TODO: replace token with url later on
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
