@@ -5,7 +5,7 @@ import {
   PlayIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Editor } from "@monaco-editor/react";
+import { Editor, loader } from "@monaco-editor/react";
 import { useRef, useState } from "react";
 import { masdrDevApi } from "shared/axios";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
@@ -45,17 +45,28 @@ const options = {
   },
 };
 
+loader.init().then((monaco) => {
+  monaco.editor.defineTheme("myTheme", {
+    base: "vs",
+    inherit: true,
+    rules: [],
+    colors: {
+      "editor.background": "#f3f4f6",
+    },
+  });
+});
+
 const QueryBuilder = () => {
   const [queryValue, setQueryValue] = useState("");
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState(false);
   const [queryResponse, setQueryResponse] = useState([]);
-  console.log(queryResponse, "queryResponse");
 
   const editorRef = useRef();
 
   const onMount = (editor) => {
     editorRef.current = editor;
+
     editor.focus();
   };
 
@@ -95,7 +106,9 @@ const QueryBuilder = () => {
     } else {
       return (
         <div className="pt-10">
-          <p className="capitalize">{!!queryResponse?.length ? queryResponse[0]?.name : ""}</p>
+          <p className="capitalize">
+            {!!queryResponse?.length ? queryResponse[0]?.name : ""}
+          </p>
           <Chart
             options={queryResponseChartOptions}
             series={queryResponse}
@@ -119,7 +132,7 @@ const QueryBuilder = () => {
               options={options}
               height="45vh"
               width="100%"
-              theme="gray-theme"
+              theme="myTheme"
               className="bg-gray-100"
               defaultLanguage="sql"
               onMount={onMount}
@@ -130,8 +143,8 @@ const QueryBuilder = () => {
             />
           </div>
           <div className="flex flex-col gap-5 p-2 items-center w-1/12">
-            {editorEvents.map((item) => (
-              <div>
+            {editorEvents.map((item, index) => (
+              <div key={index}>
                 <button
                   onClick={() => {
                     if (item.name === "Run Query") {
