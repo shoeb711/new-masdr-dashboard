@@ -1,6 +1,9 @@
-import React, { useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { ChevronDownIcon, XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
+import {
+  Bars3Icon,
+  ChevronDownIcon,
+  XMarkIcon,
+} from "@heroicons/react/20/solid";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "react-router-dom";
 import { PATH, userRole } from "shared/constant";
@@ -28,9 +31,8 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
+const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
-  // const [isSidebarOpen, setSidebarOpen] = useState(true);
   const currentUserRole = localStorage.getItem("role");
 
   return (
@@ -78,7 +80,9 @@ const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
                               isActive
                                 ? "bg-gray-50 text-indigo-600"
                                 : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
-                              "group flex items-center gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                              `group ${
+                                isSidebarOpen ? "flex" : "inline-block"
+                              } items-center gap-x-3 rounded-md p-2 text-sm/6 font-semibold`
                             )}
                           >
                             <item.icon
@@ -102,10 +106,12 @@ const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
         </div>
       </div>
 
-      <div  className={classNames(
+      <div
+        className={classNames(
           "flex-1 transition-all duration-300",
           isSidebarOpen ? "pl-72" : "pl-16"
-        )}>
+        )}
+      >
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <div aria-hidden="true" className="h-6 w-px bg-gray-200 lg:hidden" />
           <div className="flex justify-end flex-1 gap-x-4 self-stretch lg:gap-x-6">
@@ -161,6 +167,3 @@ const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
 };
 
 export default Sidebar;
-
-
-
