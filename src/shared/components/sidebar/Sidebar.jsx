@@ -1,5 +1,6 @@
+import React, { useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { ChevronDownIcon, XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "react-router-dom";
 import { PATH, userRole } from "shared/constant";
@@ -27,35 +28,48 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const Sidebar = () => {
+const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
   const location = useLocation();
-
+  // const [isSidebarOpen, setSidebarOpen] = useState(true);
   const currentUserRole = localStorage.getItem("role");
 
   return (
     <div>
-      {/* Static sidebar for desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-        {/* Sidebar component, swap this element with another sidebar if you like */}
+      {/* Collapsible Sidebar */}
+      <div
+        className={classNames(
+          "lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col transition-transform duration-300",
+          isSidebarOpen ? "lg:w-72" : "lg:w-16"
+        )}
+      >
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
-          <div className="flex h-16 shrink-0 items-center">
-            <img
-              alt="Your Company"
-              src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-              className="h-8 w-auto"
-            />
+          <div className="flex h-16 shrink-0 items-center justify-between">
+            {isSidebarOpen && (
+              <img
+                alt="Your Company"
+                src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
+                className="h-8 w-auto"
+              />
+            )}
+            <button
+              onClick={() => setSidebarOpen(!isSidebarOpen)}
+              className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            >
+              {isSidebarOpen ? (
+                <XMarkIcon className="size-6" />
+              ) : (
+                <Bars3Icon className="size-6" />
+              )}
+            </button>
           </div>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
                   {navigation
-                    .filter(
-                      (item) => item.role.includes(currentUserRole) // Check role-based access
-                    )
+                    .filter((item) => item.role.includes(currentUserRole)) // Role-based access
                     .map((item) => {
                       const isActive = item.href === location.pathname;
-
                       return (
                         <li key={item.name}>
                           <Link
@@ -64,7 +78,7 @@ const Sidebar = () => {
                               isActive
                                 ? "bg-gray-50 text-indigo-600"
                                 : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
-                              "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                              "group flex items-center gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                             )}
                           >
                             <item.icon
@@ -76,7 +90,7 @@ const Sidebar = () => {
                                 "size-6 shrink-0"
                               )}
                             />
-                            {item.name}
+                            {isSidebarOpen && item.name}
                           </Link>
                         </li>
                       );
@@ -88,19 +102,18 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="lg:pl-72">
+      <div  className={classNames(
+          "flex-1 transition-all duration-300",
+          isSidebarOpen ? "pl-72" : "pl-16"
+        )}>
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-          {/* Separator */}
           <div aria-hidden="true" className="h-6 w-px bg-gray-200 lg:hidden" />
-
           <div className="flex justify-end flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex items-center gap-x-4 lg:gap-x-6">
-              {/* Separator */}
               <div
                 aria-hidden="true"
                 className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200"
               />
-
               {/* Profile dropdown */}
               <Menu as="div" className="relative">
                 <MenuButton className="-m-1.5 flex items-center p-1.5">
@@ -142,10 +155,12 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-        {/* main content area */}
       </div>
     </div>
   );
 };
 
 export default Sidebar;
+
+
+
