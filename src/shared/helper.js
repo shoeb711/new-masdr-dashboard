@@ -70,3 +70,61 @@ export const options = {
     },
   },
 };
+
+export const queryResponseChartOptions = {
+  chart: {
+    type: "bar",
+    zoom: {
+      enabled: false,
+    },
+  },
+  plotOptions: {
+    bar: {
+      horizontal: false,
+      columnWidth: "70%",
+      endingShape: "rounded",
+    },
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  stroke: {
+    show: true,
+    width: 2,
+    colors: ["transparent"],
+  },
+  // xaxis: {
+  //   categories, // Dynamic categories from API
+  // },
+  yaxis: {
+    title: {
+      text: "Product ID",
+    },
+  },
+  fill: {
+    opacity: 1,
+  },
+  // tooltip: {
+  //   y: {
+  //     formatter: function (val) {
+  //       return val;
+  //     },
+  //   },
+  // },
+  tooltip: {
+    enabled: true,
+  },
+
+  noData: {
+    text: "No result found, Please fetch data from above Editor to render some data",
+    align: "center",
+    verticalAlign: "middle",
+    offsetX: 0,
+    offsetY: 0,
+    style: {
+      color: undefined,
+      fontSize: "16px",
+      fontFamily: undefined,
+    },
+  },
+};

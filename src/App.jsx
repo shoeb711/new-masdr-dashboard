@@ -1,6 +1,7 @@
 import Auth from "components/Auth";
 import RootLayout from "layout/rootLayout/RootLayout";
 import Dashboard from "pages/dashboard/Dashboard";
+import QueryBuilder from "pages/queryBuilder/QueryBuilder";
 import { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
@@ -35,7 +36,7 @@ function App() {
               <Auth allowedRoles={[userRole.SUPER_ADMIN, userRole.ADMIN]} />
             }
           >
-            <Route path="/querybuilder" element={<div>Query Builder</div>} />
+            <Route path="/querybuilder" element={<QueryBuilder />} />
           </Route>
         </Route>
       </Routes>
