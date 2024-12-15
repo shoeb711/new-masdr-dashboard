@@ -64,24 +64,26 @@ const Dashboard = () => {
                     <h3 className="text-base font-semibold text-gray-900">
                       {item.title}
                     </h3>
-                    <button
-                      type="button"
-                      className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    >
-                      Edit
-                    </button>
                   </div>
                 </div>
                 <div className="px-4 py-5 sm:p-6 grid md:grid-cols-2 gap-8">
                   {item.data.map((seriesData, index) => (
-                    // u can remove chart item border from below if u dont want
-                    <div className="border border-gray-200 rounded-lg p-2" key={index}>
-                      <Chart
-                        series={seriesData}
-                        options={options}
-                        type={item.type}
-                        height={300}
-                      />
+                    <div className="flex flex-col gap-3 items-end border border-gray-200 rounded-lg p-2">
+                      <button
+                        type="button"
+                        className="w-20 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                      >
+                        Edit
+                      </button>
+
+                      <div className="w-full" key={index}>
+                        <Chart
+                          series={seriesData}
+                          options={options}
+                          type={item.type}
+                          height={300}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>

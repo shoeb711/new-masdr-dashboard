@@ -123,11 +123,11 @@ const QueryBuilder = () => {
   return (
     <div>
       <div className="bg-gray-100">
-        <h4 className="w-full border-b border-gray-300 px-3 py-4">
+        <h4 className="w-full border-b border-gray-300 px-3 py-2">
           Sample Database
         </h4>
         <section className="flex items-start">
-          <div className="w-11/12">
+          <div className="w-[97%]">
             <Editor
               options={options}
               height="45vh"
@@ -142,7 +142,7 @@ const QueryBuilder = () => {
               }}
             />
           </div>
-          <div className="flex flex-col gap-5 p-2 items-center w-1/12">
+          <div className="flex flex-col gap-5 py-2 items-center pe-4">
             {editorEvents.map((item, index) => (
               <div key={index}>
                 <button
@@ -166,7 +166,6 @@ const QueryBuilder = () => {
         </section>
       </div>
 
-      {/* graph output section */}
       <div>{renderQueryOutput()}</div>
     </div>
   );
