@@ -1,6 +1,7 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Chart from "react-apexcharts";
+import Dropdown from "shared/components/customInput/dropDown";
 import { dummyData } from "shared/dummyData";
 import { options } from "shared/helper";
 
@@ -18,11 +19,19 @@ const TENANTS = [
     id: 3,
   },
 ];
+// const dropdownItems = [
+//   { type: "link", label: "Account settings", href: "/account" },
+//   { type: "link", label: "Support", href: "/support" },
+//   { type: "button", label: "License", action: () => alert("License clicked!") },
+//   { type: "button", label: "Sign out", action: () => alert("Signed out!") },
+// ];
 
 const Dashboard = () => {
   return (
     <div>
       <div className="flex justify-end py-10">
+      {/* <Dropdown buttonText="Menu" items={dropdownItems} /> */}
+
         <Menu as="div" className="relative inline-block text-left">
           <div>
             <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
@@ -38,6 +47,7 @@ const Dashboard = () => {
             transition
             className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
           >
+
             <div className="py-1">
               {TENANTS.map((item) => (
                 <MenuItem>
@@ -53,6 +63,7 @@ const Dashboard = () => {
           </MenuItems>
         </Menu>
       </div>
+    
 
       <div className="flex flex-col gap-8">
         {dummyData.map((item, idx) => {
