@@ -7,7 +7,7 @@ export const masdrDevApi = axios.create({
 // Setting up interceptors
 masdrDevApi.interceptors.request.use(
   (config) => {
-    const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnRJZCI6InRlbmFudDA5MDkiLCJ1c2VySWQiOiJtbyIsInN1YiI6Im1vIiwiaWF0IjoxNzM0MjU3Nzc2LCJleHAiOjE3MzQzNDQxNzZ9.-n53yjdEBwvsN_PCO9bdRx9hDfqY1guCzXbNpPdlTYE"; //TODO: replace token with url later on
+    const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnRJZCI6InRlbmFudDAiLCJ1c2VySWQiOiJtbyIsInN1YiI6Im1vIiwiaWF0IjoxNzM0MzUwOTg5LCJleHAiOjE3MzQ0MzczODl9.kU1G-S8xSYIihI9olc_nSQb0buZJ7t7rqTY4n5i5p5U"; //TODO: replace token with url later on
     if (token) {
       config.headers.Authorization = token;
     }

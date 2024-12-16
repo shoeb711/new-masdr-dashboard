@@ -1,3 +1,10 @@
+import {
+  ArrowUturnLeftIcon,
+  ArrowUturnRightIcon,
+  PlayIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+
 export const options = {
   chart: {
     height: 350,
@@ -74,7 +81,6 @@ export const options = {
 
 export const queryResponseChartOptions = {
   chart: {
-    type: "bar",
     zoom: {
       enabled: false,
     },
@@ -114,3 +120,68 @@ export const queryResponseChartOptions = {
     },
   },
 };
+
+export const queryResponseChartLineOptions = {
+  chart: {
+    type: "line",
+    zoom: {
+      enabled: false,
+    },
+  },
+
+  dataLabels: {
+    enabled: false,
+  },
+  // stroke: {
+  //   show: true,
+  //   width: 2,
+  //   colors: ["transparent"],
+  // },
+  // fill: {
+  //   opacity: 1,
+  // },
+  tooltip: {
+    enabled: true,
+  },
+
+  noData: {
+    text: "Your charts will appear here once you run a query. Enter your SQL query in the editor above.",
+    align: "center",
+    verticalAlign: "middle",
+    offsetX: 0,
+    offsetY: 0,
+    style: {
+      color: undefined,
+      fontSize: "16px",
+      fontFamily: undefined,
+    },
+  },
+};
+
+export const editorEvents = [
+  {
+    name: "Clear",
+    icon: XMarkIcon,
+    action: (editor) => {
+      editor.setValue("");
+    },
+  },
+  {
+    name: "Undo",
+    icon: ArrowUturnLeftIcon,
+    action: (editor) => {
+      editor.trigger("source", "undo", null);
+    },
+  },
+  {
+    name: "Redo",
+    icon: ArrowUturnRightIcon,
+    action: (editor) => {
+      editor.trigger("source", "redo", null);
+    },
+  },
+  {
+    name: "Run Query",
+    icon: PlayIcon,
+  },
+];

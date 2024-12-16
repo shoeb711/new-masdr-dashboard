@@ -10,14 +10,16 @@ const RootLayout = () => {
     return classes.filter(Boolean).join(" ");
   }
   return (
-    <div>
+    <div className="h-full">
       <Sidebar isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} />
-      {/* <main className="py-5 lg:pl-72"> */}
-      <main  className={classNames(
-          "flex-1 transition-all duration-300",
+
+      <main
+        className={classNames(
+          "flex-1 transition-all duration-300 h-[calc(100%-64px)]",
           isSidebarOpen ? "pl-72" : "pl-16"
-        )}>
-        <div className="px-4 sm:px-6 lg:px-8">
+        )}
+      >
+        <div className="px-4 sm:px-6 lg:px-8 h-full">
           <ErrorBoundary>
             <Suspense fallback={<PrimaryLoader />}>
               <Outlet />
