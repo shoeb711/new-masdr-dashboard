@@ -1,15 +1,19 @@
 import Chart from "react-apexcharts";
-
 import { Editor, loader } from "@monaco-editor/react";
 import QueryBuilderTab from "components/queryBuilderTab/QueryBuilderTab";
+import SettingDrawer from "components/settingDrawer/SettingDrawer";
 import VisualizationDrawer from "components/visualizationDrawer/VisualizationDrawer";
 import { useRef, useState } from "react";
 import { masdrDevApi } from "shared/axios";
 import CustomFlyoutModal from "shared/components/customFlyoutModal/CustomFlyoutModal";
+import Dropdown from "shared/components/customInput/dropDown";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
 import { queryBuilderTabEnum } from "shared/constant";
-import { editorEvents, queryResponseChartOptions } from "shared/helper";
-import Dropdown from "shared/components/customInput/dropDown";
+import {
+  editorEvents,
+  queryResponseChartLineOptions,
+  queryResponseChartOptions,
+} from "shared/helper";
 
 const options = {
   minimap: {
@@ -35,6 +39,7 @@ const QueryBuilder = () => {
   const [queryResponse, setQueryResponse] = useState([]);
   const [queryBuilderTab, setQueryBuilderTab] = useState("");
   const [selectedTenant, setSelectedTenant] = useState("Tenant 1");
+  const [selectedChartType, setSelectedChartType] = useState("bar");
 
   const editorRef = useRef();
 
@@ -103,9 +108,18 @@ const QueryBuilder = () => {
             {!!queryResponse?.length ? queryResponse[0]?.name : ""}
           </p>
           <Chart
-            options={queryResponseChartOptions}
-            series={queryResponse}
-            type="bar"
+            options={
+              selectedChartType === "line"
+                ? queryResponseChartLineOptions
+                : queryResponseChartOptions
+            }
+            key={selectedChartType}
+            series={
+              selectedChartType === "pie"
+                ? queryResponse[0].data
+                : queryResponse
+            }
+            type={selectedChartType}
             height="350"
           />
         </div>
@@ -175,7 +189,18 @@ const QueryBuilder = () => {
         isOpen={queryBuilderTab === queryBuilderTabEnum.VISUALIZATION}
         onClose={() => setQueryBuilderTab("")}
       >
-        <VisualizationDrawer />
+        <VisualizationDrawer
+          setSelectedChartType={setSelectedChartType}
+          selectedChartType={selectedChartType}
+          onClose={() => setQueryBuilderTab("")}
+        />
+      </CustomFlyoutModal>
+
+      <CustomFlyoutModal
+        isOpen={queryBuilderTab === queryBuilderTabEnum.SETTING}
+        onClose={() => setQueryBuilderTab("")}
+      >
+        <SettingDrawer />
       </CustomFlyoutModal>
     </>
   );

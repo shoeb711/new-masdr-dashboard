@@ -81,7 +81,6 @@ export const options = {
 
 export const queryResponseChartOptions = {
   chart: {
-    type: "bar",
     zoom: {
       enabled: false,
     },
@@ -104,6 +103,43 @@ export const queryResponseChartOptions = {
   fill: {
     opacity: 1,
   },
+  tooltip: {
+    enabled: true,
+  },
+
+  noData: {
+    text: "Your charts will appear here once you run a query. Enter your SQL query in the editor above.",
+    align: "center",
+    verticalAlign: "middle",
+    offsetX: 0,
+    offsetY: 0,
+    style: {
+      color: undefined,
+      fontSize: "16px",
+      fontFamily: undefined,
+    },
+  },
+};
+
+export const queryResponseChartLineOptions = {
+  chart: {
+    type: "line",
+    zoom: {
+      enabled: false,
+    },
+  },
+
+  dataLabels: {
+    enabled: false,
+  },
+  // stroke: {
+  //   show: true,
+  //   width: 2,
+  //   colors: ["transparent"],
+  // },
+  // fill: {
+  //   opacity: 1,
+  // },
   tooltip: {
     enabled: true,
   },
