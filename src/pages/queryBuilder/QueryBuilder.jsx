@@ -1,43 +1,15 @@
 import Chart from "react-apexcharts";
-import {
-  ArrowUturnLeftIcon,
-  ArrowUturnRightIcon,
-  PlayIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+
 import { Editor, loader } from "@monaco-editor/react";
+import QueryBuilderTab from "components/queryBuilderTab/QueryBuilderTab";
+import VisualizationDrawer from "components/visualizationDrawer/VisualizationDrawer";
 import { useRef, useState } from "react";
 import { masdrDevApi } from "shared/axios";
+import CustomFlyoutModal from "shared/components/customFlyoutModal/CustomFlyoutModal";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
-import { queryResponseChartOptions } from "shared/helper";
-
-const editorEvents = [
-  {
-    name: "Clear",
-    icon: XMarkIcon,
-    action: (editor) => {
-      editor.setValue("");
-    },
-  },
-  {
-    name: "Undo",
-    icon: ArrowUturnLeftIcon,
-    action: (editor) => {
-      editor.trigger("source", "undo", null);
-    },
-  },
-  {
-    name: "Redo",
-    icon: ArrowUturnRightIcon,
-    action: (editor) => {
-      editor.trigger("source", "redo", null);
-    },
-  },
-  {
-    name: "Run Query",
-    icon: PlayIcon,
-  },
-];
+import { queryBuilderTabEnum } from "shared/constant";
+import { editorEvents, queryResponseChartOptions } from "shared/helper";
+import Dropdown from "shared/components/customInput/dropDown";
 
 const options = {
   minimap: {
@@ -61,6 +33,8 @@ const QueryBuilder = () => {
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState(false);
   const [queryResponse, setQueryResponse] = useState([]);
+  const [queryBuilderTab, setQueryBuilderTab] = useState("");
+  const [selectedTenant, setSelectedTenant] = useState("Tenant 1");
 
   const editorRef = useRef();
 
@@ -78,10 +52,11 @@ const QueryBuilder = () => {
 
       const response = await masdrDevApi.post("query-runner/run", {
         query: queryValue,
+        tenant: selectedTenant,
       });
 
       console.log("response =>", response.data);
-      const seriesData = response?.data?.result?.map((item) => item.productId); // Y-axis values
+      const seriesData = response?.data?.result?.map((item) => item.productId);
 
       setQueryResponse([
         {
@@ -98,13 +73,31 @@ const QueryBuilder = () => {
     }
   };
 
+  const tenantOptions = [
+    {
+      label: "Tenant 1",
+      type: "button",
+      action: () => setSelectedTenant("Tenant 1"),
+    },
+    {
+      label: "Tenant 2",
+      type: "button",
+      action: () => setSelectedTenant("Tenant 2"),
+    },
+    {
+      label: "Tenant 3",
+      type: "button",
+      action: () => setSelectedTenant("Tenant 3"),
+    },
+  ];
+
   const renderQueryOutput = () => {
     if (queryLoading) {
       return <PrimaryLoader />;
     } else if (queryError) {
       return <div>Something went wrong</div>;
     } else {
-      return (
+      return !!queryResponse?.length ? (
         <div className="pt-10">
           <p className="capitalize">
             {!!queryResponse?.length ? queryResponse[0]?.name : ""}
@@ -116,58 +109,75 @@ const QueryBuilder = () => {
             height="350"
           />
         </div>
-      );
+      ) : null;
     }
   };
 
   return (
-    <div>
-      <div className="bg-gray-100">
-        <h4 className="w-full border-b border-gray-300 px-3 py-2">
-          Sample Database
-        </h4>
-        <section className="flex items-start">
-          <div className="w-[97%]">
-            <Editor
-              options={options}
-              height="45vh"
-              width="100%"
-              theme="myTheme"
-              className="bg-gray-100"
-              defaultLanguage="sql"
-              onMount={onMount}
-              value={queryValue}
-              onChange={(val) => {
-                setQueryValue(val);
-              }}
-            />
-          </div>
-          <div className="flex flex-col gap-5 py-2 items-center pe-4">
-            {editorEvents.map((item, index) => (
-              <div key={index}>
-                <button
-                  onClick={() => {
-                    if (item.name === "Run Query") {
-                      fetchChartData();
-                    } else if (editorRef.current && item.action) {
-                      item.action(editorRef.current);
-                    }
+    <>
+      <div className="flex flex-col justify-between h-full">
+        <div>
+          <div className="bg-gray-100">
+            <div className="flex justify-between items-center border-b border-gray-300 px-3 py-2">
+              <h4>Sample Database</h4>
+              <Dropdown buttonText={selectedTenant} items={tenantOptions} />
+            </div>
+            <section className="flex items-start">
+              <div className="w-[97%]">
+                <Editor
+                  options={options}
+                  height="45vh"
+                  width="100%"
+                  theme="myTheme"
+                  className="bg-gray-100"
+                  defaultLanguage="sql"
+                  onMount={onMount}
+                  value={queryValue}
+                  onChange={(val) => {
+                    setQueryValue(val);
                   }}
-                >
-                  <item.icon
-                    title={item.name}
-                    aria-hidden="true"
-                    className="size-6 shrink-0 cursor-pointer"
-                  />
-                </button>
+                />
               </div>
-            ))}
+              <div className="flex flex-col gap-5 py-2 items-center pe-4">
+                {editorEvents.map((item, index) => (
+                  <div key={index}>
+                    <button
+                      onClick={() => {
+                        if (item.name === "Run Query") {
+                          fetchChartData();
+                        } else if (editorRef.current && item.action) {
+                          item.action(editorRef.current);
+                        }
+                      }}
+                    >
+                      <item.icon
+                        title={item.name}
+                        aria-hidden="true"
+                        className="size-6 shrink-0 cursor-pointer"
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
-        </section>
+
+          <div>{renderQueryOutput()}</div>
+        </div>
+
+        <QueryBuilderTab
+          setQueryBuilderTab={setQueryBuilderTab}
+          queryBuilderTab={queryBuilderTab}
+        />
       </div>
 
-      <div>{renderQueryOutput()}</div>
-    </div>
+      <CustomFlyoutModal
+        isOpen={queryBuilderTab === queryBuilderTabEnum.VISUALIZATION}
+        onClose={() => setQueryBuilderTab("")}
+      >
+        <VisualizationDrawer />
+      </CustomFlyoutModal>
+    </>
   );
 };
 

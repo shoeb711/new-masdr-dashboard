@@ -1,3 +1,10 @@
+import {
+  ArrowUturnLeftIcon,
+  ArrowUturnRightIcon,
+  PlayIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+
 export const options = {
   chart: {
     height: 350,
@@ -114,3 +121,31 @@ export const queryResponseChartOptions = {
     },
   },
 };
+
+export const editorEvents = [
+  {
+    name: "Clear",
+    icon: XMarkIcon,
+    action: (editor) => {
+      editor.setValue("");
+    },
+  },
+  {
+    name: "Undo",
+    icon: ArrowUturnLeftIcon,
+    action: (editor) => {
+      editor.trigger("source", "undo", null);
+    },
+  },
+  {
+    name: "Redo",
+    icon: ArrowUturnRightIcon,
+    action: (editor) => {
+      editor.trigger("source", "redo", null);
+    },
+  },
+  {
+    name: "Run Query",
+    icon: PlayIcon,
+  },
+];

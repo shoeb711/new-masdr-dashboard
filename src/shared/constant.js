@@ -9,3 +9,8 @@ export const userRole = {
   ADMIN: "admin",
   USER: "user",
 };
+
+export const queryBuilderTabEnum = {
+  VISUALIZATION: "visualization",
+  SETTING: "setting",
+};
