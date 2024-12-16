@@ -1,6 +1,7 @@
 import Auth from "components/Auth";
 import RootLayout from "layout/rootLayout/RootLayout";
 import Dashboard from "pages/dashboard/Dashboard";
+import EditQueryBuilder from "pages/edit-querybuilder/EditQueryBuilder";
 import QueryBuilder from "pages/queryBuilder/QueryBuilder";
 import { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
@@ -33,10 +34,19 @@ function App() {
           </Route>
           <Route
             element={
+              // <Auth allowedRoles={[userRole.SUPER_ADMIN, userRole.ADMIN]} />
               <Auth allowedRoles={[userRole.SUPER_ADMIN, userRole.ADMIN]} />
             }
           >
             <Route path="/querybuilder" element={<QueryBuilder />} />
+          </Route>
+          <Route
+            element={
+              <Auth allowedRoles={[userRole.SUPER_ADMIN, userRole.ADMIN]} />
+              // <Auth allowedRoles={[userRole.SUPER_ADMIN]} />
+            }
+          >
+            <Route path="/edit-querybuilder" element={<EditQueryBuilder />} />
           </Route>
         </Route>
       </Routes>

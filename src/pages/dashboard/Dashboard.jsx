@@ -1,6 +1,7 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Chart from "react-apexcharts";
+import { Navigate, useNavigate } from "react-router-dom";
 import Dropdown from "shared/components/customInput/dropDown";
 import { dummyData } from "shared/dummyData";
 import { options } from "shared/helper";
@@ -27,6 +28,17 @@ const TENANTS = [
 // ];
 
 const Dashboard = () => {
+
+  const navigate = useNavigate();
+
+  // const handleEditClick = (id) => {
+  //   // Navigate to EditQueryBuilder with the dummy ID in the URL
+  //   navigate(`/edit-querybuilder?id=${id}`);
+  // };
+  const handleEditClick = (id) => {
+    navigate('/edit-querybuilder', { state: { id } });
+  };
+  
   return (
     <div>
       <div className="flex justify-end py-10">
@@ -83,6 +95,7 @@ const Dashboard = () => {
                       <button
                         type="button"
                         className="w-20 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                        onClick={() => handleEditClick(1)} // Navigate with dummy ID
                       >
                         Edit
                       </button>
