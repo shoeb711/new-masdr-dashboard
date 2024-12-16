@@ -1,6 +1,7 @@
 export const PATH = {
   dashboard: "/",
   queryBuilder: "/querybuilder",
+  editqueryBuilder: "/edit-querybuilder",
   login: "/login",
 };
 

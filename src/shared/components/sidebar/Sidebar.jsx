@@ -20,7 +20,15 @@ const navigation = [
     href: PATH.queryBuilder,
     icon: UsersIcon,
     role: [userRole.ADMIN, userRole.SUPER_ADMIN],
+    // role: [ userRole.SUPER_ADMIN],
   },
+  // {
+  //   name: " Edit Query Builder",
+  //   href: PATH.editqueryBuilder,
+  //   icon: UsersIcon,
+  //   role: [userRole.ADMIN, userRole.SUPER_ADMIN],
+  //   // role: [ userRole.SUPER_ADMIN],
+  // },
 ];
 const userNavigation = [
   { name: "Your profile", href: "#" },
