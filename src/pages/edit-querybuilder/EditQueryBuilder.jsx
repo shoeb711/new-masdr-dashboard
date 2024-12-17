@@ -1,44 +1,13 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import Chart from "react-apexcharts";
-import {
-  ArrowUturnLeftIcon,
-  ArrowUturnRightIcon,
-  PlayIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
 import { Editor, loader } from "@monaco-editor/react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
+import Chart from "react-apexcharts";
+import { useLocation, useParams } from "react-router-dom";
 import { masdrDevApi } from "shared/axios";
+import Dropdown from "shared/components/customInput/DropDown";
+import InputField from "shared/components/customInput/TextArea";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
-import { queryResponseChartOptions } from "shared/helper";
-
-const editorEvents = [
-  {
-    name: "Clear",
-    icon: XMarkIcon,
-    action: (editor) => {
-      editor.setValue("");
-    },
-  },
-  {
-    name: "Undo",
-    icon: ArrowUturnLeftIcon,
-    action: (editor) => {
-      editor.trigger("source", "undo", null);
-    },
-  },
-  {
-    name: "Redo",
-    icon: ArrowUturnRightIcon,
-    action: (editor) => {
-      editor.trigger("source", "redo", null);
-    },
-  },
-  {
-    name: "Run Query",
-    icon: PlayIcon,
-  },
-];
+import { userRole } from "shared/constant";
+import { editorEvents, queryResponseChartOptions } from "shared/helper";
 
 const options = {
   minimap: {
@@ -58,25 +27,26 @@ loader.init().then((monaco) => {
 });
 
 const EditQueryBuilder = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
-  
-    // Extract ID from state
-    const id = location.state?.id;
-  
-    const [queryValue, setQueryValue] = useState("");
-    const [queryLoading, setQueryLoading] = useState(false);
-    const [queryError, setQueryError] = useState(false);
-    const [queryResponse, setQueryResponse] = useState([]);
-  
-    const editorRef = useRef();
+  const { chartId } = useParams();
+  const {
+    state: { singleChartData },
+  } = useLocation();
 
-  useEffect(() => {
-    if (!id) {
-      // Redirect to dashboard if no ID is found in query params
-      navigate("/");
-    }
-  }, [id, navigate]);
+  const [queryValue, setQueryValue] = useState(
+    !!singleChartData[0]?.queryValue ? singleChartData[0]?.queryValue : ""
+  );
+  const [queryLoading, setQueryLoading] = useState(false);
+  const [queryError, setQueryError] = useState(false);
+  const [queryResponse, setQueryResponse] = useState(
+    !!singleChartData?.length ? singleChartData : []
+  );
+  const [chartInputValue, setChartInputValue] = useState(
+    !!singleChartData[0]?.name ? singleChartData[0]?.name : ""
+  );
+
+  const role = localStorage.getItem("role");
+
+  const editorRef = useRef();
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -120,7 +90,8 @@ const EditQueryBuilder = () => {
       return (
         <div className="pt-10">
           <p className="capitalize">
-            {!!queryResponse?.length ? queryResponse[0]?.name : ""} for ID: {id}
+            {!!queryResponse?.length ? queryResponse[0]?.name : ""} for ID:{" "}
+            {chartId}
           </p>
           <Chart
             options={queryResponseChartOptions}
@@ -135,11 +106,26 @@ const EditQueryBuilder = () => {
 
   return (
     <div>
-      <h1 className="text-lg font-bold p-4">Edit Query Builder for ID: {id}</h1>
+      <div className="flex justify-between items-center p-4">
+        <h1 className="text-lg font-bold">
+          Edit Query Builder for ID: {chartId}
+        </h1>
+        {role === userRole.SUPER_ADMIN && (
+          <Dropdown buttonText={singleChartData[0]?.tenantName} />
+        )}
+      </div>
+
       <div className="bg-gray-100">
-        <h4 className="w-full border-b border-gray-300 px-3 py-2">
-          Sample Database
-        </h4>
+        <div className="flex justify-between items-center border-b border-gray-300 px-3 py-2">
+          {/* <h4>Sample Database</h4> */}
+          <div className="w-96">
+            <InputField
+              value={chartInputValue}
+              onChange={(e) => setChartInputValue(e.target.value)}
+              placeholder="Enter Chart Title"
+            />
+          </div>
+        </div>
         <section className="flex items-start">
           <div className="w-[97%]">
             <Editor
