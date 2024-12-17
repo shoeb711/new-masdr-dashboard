@@ -68,13 +68,13 @@ const Dashboard = () => {
           return (
             <div key={idx}>
               <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">
-                <div className="px-4 py-5 sm:px-6">
+                {/* <div className="px-4 py-5 sm:px-6">
                   <div className="flex justify-between w-full mb-4">
                     {/* <h3 className="text-base font-semibold text-gray-900">
                       {item.title}
-                    </h3> */}
+                    </h3> 
                   </div>
-                </div>
+                </div> */}
                 <div className="px-4 py-5 sm:p-6 grid md:grid-cols-2 gap-8">
                   {item.data.map((seriesData, index) => (
                     <div
