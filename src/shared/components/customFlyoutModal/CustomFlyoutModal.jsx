@@ -12,7 +12,7 @@ const CustomFlyoutModal = ({ isOpen, onClose, children }) => {
               transition
               className="pointer-events-auto w-screen max-w-72 transform transition duration-100 ease-in-out data-[closed]:-translate-x-full sm:duration-700"
             >
-              <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+              <div className="flex h-full flex-col overflow-y-auto bg-white py-6 shadow-xl">
                 <div className="relative flex-1 px-4 sm:px-6">{children}</div>
               </div>
             </DialogPanel>
