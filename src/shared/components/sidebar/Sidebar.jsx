@@ -1,8 +1,6 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
-  Bars3Icon,
-  ChevronDownIcon,
-  XMarkIcon,
+  ChevronDownIcon
 } from "@heroicons/react/20/solid";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "react-router-dom";
@@ -53,24 +51,13 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
         )}
       >
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
-          <div className="flex h-16 shrink-0 items-center justify-between">
-            {isSidebarOpen && (
-              <img
-                alt="Your Company"
-                src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-                className="h-8 w-auto"
-              />
-            )}
-            <button
+          <div className="flex h-12 w-12 shrink-0 items-center justify-between">
+            <img
+              alt="Your Company"
+              src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
+              className="h-8 w-8 cursor-pointer"
               onClick={() => setSidebarOpen(!isSidebarOpen)}
-              className="text-gray-500 hover:text-gray-700 focus:outline-none"
-            >
-              {isSidebarOpen ? (
-                <XMarkIcon className="size-6" />
-              ) : (
-                <Bars3Icon className="size-6" />
-              )}
-            </button>
+            />
           </div>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
