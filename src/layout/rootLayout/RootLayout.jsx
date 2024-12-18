@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import ErrorBoundary from "shared/components/errorBoundary/ErrorBoundary";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
@@ -10,6 +10,11 @@ function classNames(...classes) {
 
 const RootLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    localStorage.setItem("role", "super-admin");
+  }, []);
+ 
 
   return (
     <div className="h-full">

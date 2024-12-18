@@ -3,6 +3,7 @@ import Chart from "react-apexcharts";
 import { useNavigate } from "react-router-dom";
 import { masdrDevApi } from "shared/axios";
 import Dropdown from "shared/components/customInput/DropDown";
+import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
 import { PATH, userRole } from "shared/constant";
 import { dummyData } from "shared/dummyData";
 import { options } from "shared/helper";
@@ -13,10 +14,12 @@ const Dashboard = () => {
 
   const [tenants, setTenants] = useState([]); 
   const [selectedTenant, setSelectedTenant] = useState(""); 
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchTenants = async () => {
       try {
+        setLoading(true)
         const res = await masdrDevApi.get("/tenant/tenantlist", {
           headers: {
             "ngrok-skip-browser-warning": true, // Custom header
@@ -35,6 +38,9 @@ const Dashboard = () => {
       } catch (error) {
         console.error("Error fetching tenant list:", error);
       }
+      finally {
+        setLoading(false)
+      }
     };
 
     fetchTenants();
@@ -42,7 +48,8 @@ const Dashboard = () => {
 
   return (
     <div>
-      <div className="flex justify-end py-10">
+      <div className="flex justify-between py-10">
+      <h1 className="text-4xl font-bold">Dashboard</h1>
         {role === userRole.SUPER_ADMIN && (
           <Dropdown
             buttonText={selectedTenant || "Select Tenant"} 
@@ -52,7 +59,7 @@ const Dashboard = () => {
       </div>
 
       <div className="flex flex-col gap-8">
-        {dummyData.map((item, idx) => {
+        {loading ? <><PrimaryLoader /></>:selectedTenant && dummyData.map((item, idx) => {
           return (
             <div key={idx}>
               <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">

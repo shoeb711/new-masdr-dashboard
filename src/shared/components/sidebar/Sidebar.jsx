@@ -1,7 +1,5 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import {
-  ChevronDownIcon
-} from "@heroicons/react/20/solid";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "react-router-dom";
 import { PATH, userRole } from "shared/constant";
@@ -101,7 +99,7 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
         </div>
       </div>
 
-      <div
+      {/* <div
         className={classNames(
           "flex-1 transition-all duration-300",
           isSidebarOpen ? "pl-72" : "pl-16"
@@ -116,7 +114,7 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
                 className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200"
               />
               {/* Profile dropdown */}
-              <Menu as="div" className="relative">
+              {/* <Menu as="div" className="relative">
                 <MenuButton className="-m-1.5 flex items-center p-1.5">
                   <span className="sr-only">Open user menu</span>
                   <img
@@ -156,7 +154,7 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
