@@ -1,11 +1,12 @@
 import Auth from "components/Auth";
 import RootLayout from "layout/rootLayout/RootLayout";
 import Dashboard from "pages/dashboard/Dashboard";
+import EditQueryBuilder from "pages/edit-querybuilder/EditQueryBuilder";
 import QueryBuilder from "pages/queryBuilder/QueryBuilder";
 import { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
-import { userRole } from "shared/constant";
+import { PATH, userRole } from "shared/constant";
 
 function App() {
   return (
@@ -29,14 +30,18 @@ function App() {
               />
             }
           >
-            <Route path="/" element={<Dashboard />} />
+            <Route path={PATH.dashboard} element={<Dashboard />} />
           </Route>
           <Route
             element={
               <Auth allowedRoles={[userRole.SUPER_ADMIN, userRole.ADMIN]} />
             }
           >
-            <Route path="/querybuilder" element={<QueryBuilder />} />
+            <Route path={PATH.queryBuilder} element={<QueryBuilder />} />
+            <Route
+              path={`${PATH.editqueryBuilder}/:chartId`}
+              element={<EditQueryBuilder />}
+            />
           </Route>
         </Route>
       </Routes>

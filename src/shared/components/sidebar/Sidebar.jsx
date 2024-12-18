@@ -1,6 +1,7 @@
-import React, { useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { ChevronDownIcon, XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
+import {
+  ChevronDownIcon
+} from "@heroicons/react/20/solid";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { Link, useLocation } from "react-router-dom";
 import { PATH, userRole } from "shared/constant";
@@ -17,7 +18,15 @@ const navigation = [
     href: PATH.queryBuilder,
     icon: UsersIcon,
     role: [userRole.ADMIN, userRole.SUPER_ADMIN],
+    // role: [ userRole.SUPER_ADMIN],
   },
+  // {
+  //   name: " Edit Query Builder",
+  //   href: PATH.editqueryBuilder,
+  //   icon: UsersIcon,
+  //   role: [userRole.ADMIN, userRole.SUPER_ADMIN],
+  //   // role: [ userRole.SUPER_ADMIN],
+  // },
 ];
 const userNavigation = [
   { name: "Your profile", href: "#" },
@@ -28,9 +37,8 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
+const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
-  // const [isSidebarOpen, setSidebarOpen] = useState(true);
   const currentUserRole = localStorage.getItem("role");
 
   return (
@@ -43,24 +51,13 @@ const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
         )}
       >
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
-          <div className="flex h-16 shrink-0 items-center justify-between">
-            {isSidebarOpen && (
-              <img
-                alt="Your Company"
-                src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-                className="h-8 w-auto"
-              />
-            )}
-            <button
+          <div className="flex h-12 w-12 shrink-0 items-center justify-between">
+            <img
+              alt="Your Company"
+              src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
+              className="h-8 w-8 cursor-pointer"
               onClick={() => setSidebarOpen(!isSidebarOpen)}
-              className="text-gray-500 hover:text-gray-700 focus:outline-none"
-            >
-              {isSidebarOpen ? (
-                <XMarkIcon className="size-6" />
-              ) : (
-                <Bars3Icon className="size-6" />
-              )}
-            </button>
+            />
           </div>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -78,7 +75,9 @@ const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
                               isActive
                                 ? "bg-gray-50 text-indigo-600"
                                 : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
-                              "group flex items-center gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                              `group ${
+                                isSidebarOpen ? "flex" : "inline-block"
+                              } items-center gap-x-3 rounded-md p-2 text-sm/6 font-semibold`
                             )}
                           >
                             <item.icon
@@ -102,10 +101,12 @@ const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
         </div>
       </div>
 
-      <div  className={classNames(
+      <div
+        className={classNames(
           "flex-1 transition-all duration-300",
           isSidebarOpen ? "pl-72" : "pl-16"
-        )}>
+        )}
+      >
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <div aria-hidden="true" className="h-6 w-px bg-gray-200 lg:hidden" />
           <div className="flex justify-end flex-1 gap-x-4 self-stretch lg:gap-x-6">
@@ -161,6 +162,3 @@ const Sidebar = ({isSidebarOpen,setSidebarOpen}) => {
 };
 
 export default Sidebar;
-
-
-
