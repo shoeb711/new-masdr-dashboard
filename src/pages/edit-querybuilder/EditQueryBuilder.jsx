@@ -1,13 +1,21 @@
 import { Editor, loader } from "@monaco-editor/react";
-import { useRef, useState } from "react";
+import QueryBuilderTab from "components/queryBuilderTab/QueryBuilderTab";
+import SettingDrawer from "components/settingDrawer/SettingDrawer";
+import VisualizationDrawer from "components/visualizationDrawer/VisualizationDrawer";
+import { useEffect, useRef, useState } from "react";
 import Chart from "react-apexcharts";
 import { useLocation, useParams } from "react-router-dom";
 import { masdrDevApi } from "shared/axios";
+import CustomFlyoutModal from "shared/components/customFlyoutModal/CustomFlyoutModal";
 import Dropdown from "shared/components/customInput/DropDown";
 import InputField from "shared/components/customInput/TextArea";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
-import { userRole } from "shared/constant";
-import { editorEvents, queryResponseChartOptions } from "shared/helper";
+import { queryBuilderTabEnum, userRole } from "shared/constant";
+import {
+  editorEvents,
+  queryResponseChartLineOptions,
+  queryResponseChartOptions,
+} from "shared/helper";
 
 const options = {
   minimap: {
@@ -37,6 +45,8 @@ const EditQueryBuilder = () => {
   );
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState(false);
+  const [queryBuilderTab, setQueryBuilderTab] = useState("");
+  const [selectedChartType, setSelectedChartType] = useState("");
   const [queryResponse, setQueryResponse] = useState(
     !!singleChartData?.length ? singleChartData : []
   );
@@ -63,7 +73,6 @@ const EditQueryBuilder = () => {
         query: queryValue,
       });
 
-      console.log("response =>", response.data);
       const seriesData = response?.data?.result?.map((item) => item.productId); // Y-axis values
 
       setQueryResponse([
@@ -81,6 +90,11 @@ const EditQueryBuilder = () => {
     }
   };
 
+  useEffect(() => {
+    if (queryResponse[0]?.chartType)
+    setSelectedChartType(queryResponse[0].chartType)
+  }, [queryResponse])
+
   const renderQueryOutput = () => {
     if (queryLoading) {
       return <PrimaryLoader />;
@@ -94,9 +108,18 @@ const EditQueryBuilder = () => {
             {chartId}
           </p>
           <Chart
-            options={queryResponseChartOptions}
-            series={queryResponse}
-            type="bar"
+            options={
+              queryResponse[0].chartType === "line"
+                ? queryResponseChartLineOptions
+                : queryResponseChartOptions
+            }
+            key={queryResponse[0].chartType}
+            series={
+              queryResponse[0].chartType === "pie"
+                ? queryResponse[0].data
+                : queryResponse
+            }
+            type={queryResponse[0].chartType}
             height="350"
           />
         </div>
@@ -165,8 +188,29 @@ const EditQueryBuilder = () => {
           </div>
         </section>
       </div>
-
       <div>{renderQueryOutput()}</div>
+      <QueryBuilderTab
+            setQueryBuilderTab={setQueryBuilderTab}
+            queryBuilderTab={queryBuilderTab}
+          />
+      <CustomFlyoutModal
+          isOpen={queryBuilderTab === queryBuilderTabEnum.VISUALIZATION}
+          onClose={() => setQueryBuilderTab("")}
+          modalClassName="overflow-visible"
+        >
+          <VisualizationDrawer
+            setSelectedChartType={setSelectedChartType}
+            selectedChartType={selectedChartType}
+            onClose={() => setQueryBuilderTab("")}
+          />
+        </CustomFlyoutModal>
+
+        <CustomFlyoutModal
+          isOpen={queryBuilderTab === queryBuilderTabEnum.SETTING}
+          onClose={() => setQueryBuilderTab("")}
+        >
+          <SettingDrawer />
+        </CustomFlyoutModal>
     </div>
   );
 };
