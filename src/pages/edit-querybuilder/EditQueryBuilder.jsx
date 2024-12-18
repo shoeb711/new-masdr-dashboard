@@ -8,7 +8,7 @@ import { useLocation, useParams } from "react-router-dom";
 import { masdrDevApi } from "shared/axios";
 import CustomFlyoutModal from "shared/components/customFlyoutModal/CustomFlyoutModal";
 import Dropdown from "shared/components/customInput/DropDown";
-import InputField from "shared/components/customInput/TextArea";
+import InputField from "shared/components/customInput/InputField";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
 import { queryBuilderTabEnum, userRole } from "shared/constant";
 import {
