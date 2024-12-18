@@ -10,7 +10,7 @@ const Auth = ({ allowedRoles }) => {
     if (allowedRoles.includes(role)) {
       return <Outlet />;
     }
-    return <Navigate to={PATH.login} state={{ from: location }} replace />;
+    return <Navigate to={PATH.dashboard} state={{ from: location }} replace />;
   };
 
   return renderContent();
