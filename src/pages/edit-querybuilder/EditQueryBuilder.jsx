@@ -46,7 +46,9 @@ const EditQueryBuilder = () => {
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState(false);
   const [queryBuilderTab, setQueryBuilderTab] = useState("");
-  const [selectedChartType, setSelectedChartType] = useState("");
+  const [selectedChartType, setSelectedChartType] = useState(
+    !!singleChartData[0].chartType ? singleChartData[0].chartType : "bar"
+  );
   const [queryResponse, setQueryResponse] = useState(
     !!singleChartData?.length ? singleChartData : []
   );
@@ -92,8 +94,8 @@ const EditQueryBuilder = () => {
 
   useEffect(() => {
     if (queryResponse[0]?.chartType)
-    setSelectedChartType(queryResponse[0].chartType)
-  }, [queryResponse])
+      setSelectedChartType(queryResponse[0].chartType);
+  }, [queryResponse]);
 
   const renderQueryOutput = () => {
     if (queryLoading) {
@@ -109,17 +111,17 @@ const EditQueryBuilder = () => {
           </p>
           <Chart
             options={
-              queryResponse[0].chartType === "line"
+              selectedChartType === "line"
                 ? queryResponseChartLineOptions
                 : queryResponseChartOptions
             }
-            key={queryResponse[0].chartType}
+            key={selectedChartType}
             series={
-              queryResponse[0].chartType === "pie"
+              selectedChartType === "pie"
                 ? queryResponse[0].data
                 : queryResponse
             }
-            type={queryResponse[0].chartType}
+            type={selectedChartType}
             height="350"
           />
         </div>
@@ -190,27 +192,27 @@ const EditQueryBuilder = () => {
       </div>
       <div>{renderQueryOutput()}</div>
       <QueryBuilderTab
-            setQueryBuilderTab={setQueryBuilderTab}
-            queryBuilderTab={queryBuilderTab}
-          />
+        setQueryBuilderTab={setQueryBuilderTab}
+        queryBuilderTab={queryBuilderTab}
+      />
       <CustomFlyoutModal
-          isOpen={queryBuilderTab === queryBuilderTabEnum.VISUALIZATION}
+        isOpen={queryBuilderTab === queryBuilderTabEnum.VISUALIZATION}
+        onClose={() => setQueryBuilderTab("")}
+        modalClassName="overflow-visible"
+      >
+        <VisualizationDrawer
+          setSelectedChartType={setSelectedChartType}
+          selectedChartType={selectedChartType}
           onClose={() => setQueryBuilderTab("")}
-          modalClassName="overflow-visible"
-        >
-          <VisualizationDrawer
-            setSelectedChartType={setSelectedChartType}
-            selectedChartType={selectedChartType}
-            onClose={() => setQueryBuilderTab("")}
-          />
-        </CustomFlyoutModal>
+        />
+      </CustomFlyoutModal>
 
-        <CustomFlyoutModal
-          isOpen={queryBuilderTab === queryBuilderTabEnum.SETTING}
-          onClose={() => setQueryBuilderTab("")}
-        >
-          <SettingDrawer />
-        </CustomFlyoutModal>
+      <CustomFlyoutModal
+        isOpen={queryBuilderTab === queryBuilderTabEnum.SETTING}
+        onClose={() => setQueryBuilderTab("")}
+      >
+        <SettingDrawer onClose={() => setQueryBuilderTab("")} />
+      </CustomFlyoutModal>
     </div>
   );
 };

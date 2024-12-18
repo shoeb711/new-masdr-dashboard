@@ -4,11 +4,13 @@ import ErrorBoundary from "shared/components/errorBoundary/ErrorBoundary";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
 import Sidebar from "shared/components/sidebar/Sidebar";
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
 const RootLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  function classNames(...classes) {
-    return classes.filter(Boolean).join(" ");
-  }
+
   return (
     <div className="h-full">
       <Sidebar isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} />

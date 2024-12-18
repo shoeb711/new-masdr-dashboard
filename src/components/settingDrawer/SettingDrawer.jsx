@@ -1,17 +1,31 @@
+import SettingDataContent from "components/settingDataContent/SettingDataContent";
+import SettingDisplayContent from "components/settingDisplayContent/SettingDisplayContent";
 import { useState } from "react";
 
-const tabs = [
-  { name: "Data", href: "#", current: false },
-  { name: "Display", href: "#", current: false },
-  { name: "Axes", href: "#", current: true },
-];
+const tabs = [{ name: "data" }, { name: "display" }, { name: "axes" }];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const SettingDrawer = () => {
-  const [selectedSettingTab, setSelectedSettingTab] = useState("");
+const SettingDrawer = ({ onClose }) => {
+  const [selectedSettingTab, setSelectedSettingTab] = useState("data");
+
+  const renderSettingDrawerContent = (tab) => {
+    switch (tab) {
+      case "data":
+        return <SettingDataContent />;
+
+      case "display":
+        return <SettingDisplayContent />;
+
+      case "axes":
+        return <div>Axes content</div>;
+
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="flex flex-col justify-between h-full">
@@ -27,7 +41,7 @@ const SettingDrawer = () => {
                     selectedSettingTab === tab.name
                       ? "border-indigo-500 text-indigo-600"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "w-1/4 border-b-2 px-1 py-4 text-center text-sm font-medium"
+                    "w-1/4 border-b-2 px-1 py-4 text-center text-sm font-medium capitalize"
                   )}
                 >
                   {tab.name}
@@ -36,10 +50,17 @@ const SettingDrawer = () => {
             </nav>
           </div>
         </div>
+
+        {/* tab content */}
+        <div className="mt-3">
+          {renderSettingDrawerContent(selectedSettingTab)}
+        </div>
       </div>
 
       <div className="flex justify-center">
-        <button className="btn-primary w-48">Done</button>
+        <button className="btn-primary w-48" onClick={onClose}>
+          Done
+        </button>
       </div>
     </div>
   );
