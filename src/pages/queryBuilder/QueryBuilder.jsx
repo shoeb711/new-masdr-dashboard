@@ -131,7 +131,7 @@ const QueryBuilder = () => {
 
   return (
     <>
-      <div>
+      <div className="h-[calc(100%-64px)]">
         <div className="flex justify-between items-center p-4">
           <h1 className="text-lg font-bold">QUERY BUILDER</h1>
           {role === userRole.SUPER_ADMIN && (
