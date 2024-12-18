@@ -1,4 +1,4 @@
-import InputField from "shared/components/customInput/TextArea";
+import InputField from "shared/components/customInput/InputField";
 
 const SettingDataContent = () => {
   return (
