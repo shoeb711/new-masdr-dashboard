@@ -1,8 +1,9 @@
+
 import { Editor, loader } from "@monaco-editor/react";
 import QueryBuilderTab from "components/queryBuilderTab/QueryBuilderTab";
 import SettingDrawer from "components/settingDrawer/SettingDrawer";
 import VisualizationDrawer from "components/visualizationDrawer/VisualizationDrawer";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Chart from "react-apexcharts";
 import { masdrDevApi } from "shared/axios";
 import CustomFlyoutModal from "shared/components/customFlyoutModal/CustomFlyoutModal";
@@ -15,6 +16,7 @@ import {
   queryResponseChartLineOptions,
   queryResponseChartOptions,
 } from "shared/helper";
+import { useFetch } from "shared/hooks/useFetch";
 
 const options = {
   minimap: {
@@ -39,7 +41,8 @@ const QueryBuilder = () => {
   const [queryError, setQueryError] = useState(false);
   const [queryResponse, setQueryResponse] = useState([]);
   const [queryBuilderTab, setQueryBuilderTab] = useState("");
-  const [selectedTenant, setSelectedTenant] = useState("Tenant 1");
+  const [tenants, setTenants] = useState([]); // State to store tenant list
+  const [selectedTenant, setSelectedTenant] = useState(""); // Updated to match dynamic tenants
   const [selectedChartType, setSelectedChartType] = useState("bar");
 
   const role = localStorage.getItem("role");
@@ -50,6 +53,8 @@ const QueryBuilder = () => {
     editorRef.current = editor;
     editor.focus();
   };
+
+
 
   const fetchChartData = async () => {
     if (!queryValue) return;
@@ -80,23 +85,33 @@ const QueryBuilder = () => {
     }
   };
 
-  const tenantOptions = [
-    {
-      label: "Tenant 1",
-      type: "button",
-      action: () => setSelectedTenant("Tenant 1"),
-    },
-    {
-      label: "Tenant 2",
-      type: "button",
-      action: () => setSelectedTenant("Tenant 2"),
-    },
-    {
-      label: "Tenant 3",
-      type: "button",
-      action: () => setSelectedTenant("Tenant 3"),
-    },
-  ];
+  useEffect(() => {
+    const fetchTenants = async () => {
+      try {
+        const res = await masdrDevApi.get("/tenant/tenantlist", {
+          headers: {
+            "ngrok-skip-browser-warning": true,
+          },
+        });
+
+        // Map tenant data from the API response
+        const tenantList = res?.data?.data?.map((tenant) => ({
+          label: tenant.tenantId, // Use tenantId as the label
+          type: "button", // Define button type
+          action: () => setSelectedTenant(tenant.tenantId), // Update selected tenant
+        }));
+
+        setTenants(tenantList); // Update tenants with dynamic data
+        if (tenantList.length > 0) {
+          setSelectedTenant(tenantList[0].label); // Default to the first tenant
+        }
+      } catch (error) {
+        console.error("Error fetching tenant list:", error);
+      }
+    };
+
+    fetchTenants();
+  }, []);
 
   const renderQueryOutput = () => {
     if (queryLoading) {
@@ -135,7 +150,7 @@ const QueryBuilder = () => {
         <div className="flex justify-between items-center p-4">
           <h1 className="text-lg font-bold">QUERY BUILDER</h1>
           {role === userRole.SUPER_ADMIN && (
-            <Dropdown buttonText={selectedTenant} items={tenantOptions} />
+            <Dropdown buttonText={selectedTenant || "Select Tenant"} items={tenants} />
           )}
         </div>
 
@@ -212,7 +227,8 @@ const QueryBuilder = () => {
           isOpen={queryBuilderTab === queryBuilderTabEnum.SETTING}
           onClose={() => setQueryBuilderTab("")}
         >
-          <SettingDrawer />
+            onClose={() => setQueryBuilderTab("")}
+            <SettingDrawer  />
         </CustomFlyoutModal>
       </div>
     </>
