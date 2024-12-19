@@ -1,16 +1,17 @@
+import { PlayIcon } from "@heroicons/react/24/outline";
 import { Editor, loader } from "@monaco-editor/react";
 import QueryBuilderTab from "components/queryBuilderTab/QueryBuilderTab";
 import SettingDrawer from "components/settingDrawer/SettingDrawer";
 import VisualizationDrawer from "components/visualizationDrawer/VisualizationDrawer";
 import { useEffect, useRef, useState } from "react";
 import Chart from "react-apexcharts";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { masdrDevApi } from "shared/axios";
 import CustomFlyoutModal from "shared/components/customFlyoutModal/CustomFlyoutModal";
 import Dropdown from "shared/components/customInput/DropDown";
 import InputField from "shared/components/customInput/InputField";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
-import { queryBuilderTabEnum, userRole } from "shared/constant";
+import { PATH, queryBuilderTabEnum, userRole } from "shared/constant";
 import {
   editorEvents,
   queryResponseChartLineOptions,
@@ -35,6 +36,7 @@ loader.init().then((monaco) => {
 });
 
 const EditQueryBuilder = () => {
+  const navigate = useNavigate();
   const { chartId } = useParams();
   const {
     state: { singleChartData },
@@ -136,7 +138,15 @@ const EditQueryBuilder = () => {
           Edit Query Builder for ID: {chartId}
         </h1>
         {role === userRole.SUPER_ADMIN && (
-          <Dropdown buttonText={singleChartData[0]?.tenantName} />
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(PATH.queryBuilder)}
+              className="btn-primary w-48 rounded-md h-9 p-0"
+            >
+              Add new query
+            </button>
+            <Dropdown buttonText={singleChartData[0]?.tenantName} />
+          </div>
         )}
       </div>
 
@@ -179,17 +189,30 @@ const EditQueryBuilder = () => {
                     }
                   }}
                 >
-                  <item.icon
-                    title={item.name}
-                    aria-hidden="true"
-                    className="size-6 shrink-0 cursor-pointer"
-                  />
+                  {item.name === "Run Query" ? (
+                    <div>
+                      <button
+                        onClick={fetchChartData}
+                        className="btn-primary bg-indigo-600 hover:bg-indigo-500 text-gray-700 w-full flex justify-center items-center rounded-md h-9 p-1"
+                        title="Submit"
+                      >
+                        <PlayIcon className="size-6 shrink-0 cursor-pointer text-white" />
+                      </button>
+                    </div>
+                  ) : (
+                    <item.icon
+                      title={item.name}
+                      aria-hidden="true"
+                      className="size-6 shrink-0 cursor-pointer"
+                    />
+                  )}
                 </button>
               </div>
             ))}
           </div>
         </section>
       </div>
+
       <div>{renderQueryOutput()}</div>
       <QueryBuilderTab
         setQueryBuilderTab={setQueryBuilderTab}
