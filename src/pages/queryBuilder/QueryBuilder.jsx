@@ -1,3 +1,4 @@
+import { PlayIcon } from "@heroicons/react/24/outline";
 import { Editor, loader } from "@monaco-editor/react";
 import QueryBuilderTab from "components/queryBuilderTab/QueryBuilderTab";
 import SettingDrawer from "components/settingDrawer/SettingDrawer";
@@ -188,11 +189,23 @@ const QueryBuilder = () => {
                         }
                       }}
                     >
-                      <item.icon
-                        title={item.name}
-                        aria-hidden="true"
-                        className="size-6 shrink-0 cursor-pointer"
-                      />
+                      {item.name === "Run Query" ? (
+                        <div>
+                          <button
+                            onClick={fetchChartData}
+                            className="btn-primary bg-indigo-600 hover:bg-indigo-500 text-gray-700 w-full flex justify-center items-center rounded-md h-9 p-1"
+                            title="Submit"
+                          >
+                            <PlayIcon className="size-6 shrink-0 cursor-pointer text-white" />
+                          </button>
+                        </div>
+                      ) : (
+                        <item.icon
+                          title={item.name}
+                          aria-hidden="true"
+                          className="size-6 shrink-0 cursor-pointer"
+                        />
+                      )}
                     </button>
                   </div>
                 ))}
