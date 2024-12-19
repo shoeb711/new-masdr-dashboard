@@ -238,8 +238,7 @@ const QueryBuilder = () => {
         isOpen={queryBuilderTab === queryBuilderTabEnum.SETTING}
         onClose={() => setQueryBuilderTab("")}
       >
-        onClose={() => setQueryBuilderTab("")}
-        <SettingDrawer />
+        <SettingDrawer onClose={() => setQueryBuilderTab("")} />
       </CustomFlyoutModal>
     </div>
   );
