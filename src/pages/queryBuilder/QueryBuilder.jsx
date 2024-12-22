@@ -184,6 +184,7 @@ const QueryBuilder = () => {
                       onClick={() => {
                         if (item.name === "Run Query") {
                           fetchChartData();
+                          return
                         } else if (editorRef.current && item.action) {
                           item.action(editorRef.current);
                         }
@@ -192,7 +193,6 @@ const QueryBuilder = () => {
                       {item.name === "Run Query" ? (
                         <div>
                           <button
-                            onClick={fetchChartData}
                             className="btn-primary bg-indigo-600 hover:bg-indigo-500 text-gray-700 w-full flex justify-center items-center rounded-md h-9 p-1"
                             title="Submit"
                           >
