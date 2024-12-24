@@ -11,10 +11,11 @@ function classNames(...classes) {
 const RootLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
+  const currentUserRole = localStorage.getItem("role");
+
   useEffect(() => {
     localStorage.setItem("role", "super-admin");
   }, []);
- 
 
   return (
     <div className="h-full">
@@ -23,7 +24,11 @@ const RootLayout = () => {
       <main
         className={classNames(
           "flex-1 transition-all duration-300 h-[calc(100%-64px)]",
-          isSidebarOpen ? "pl-72" : "pl-16"
+          isSidebarOpen && currentUserRole === "user"
+            ? "pl-0"
+            : isSidebarOpen
+            ? "pl-72"
+            : "pl-16"
         )}
       >
         <div className="px-4 sm:px-6 lg:px-8 h-full">
