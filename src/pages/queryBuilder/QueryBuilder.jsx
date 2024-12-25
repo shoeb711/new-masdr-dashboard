@@ -16,12 +16,8 @@ import {
   queryResponseChartLineOptions,
   queryResponseChartOptions,
 } from "shared/helper";
+import { Parser } from "node-sql-parser"; // Import the SQL parser
 
-const options = {
-  minimap: {
-    enabled: false,
-  },
-};
 
 loader.init().then((monaco) => {
   monaco.editor.defineTheme("myTheme", {
@@ -35,7 +31,7 @@ loader.init().then((monaco) => {
 });
 
 const QueryBuilder = () => {
-  const [queryValue, setQueryValue] = useState("");
+  // const [queryValue, setQueryValue] = useState("");
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState(false);
   const [queryResponse, setQueryResponse] = useState([]);
@@ -44,6 +40,51 @@ const QueryBuilder = () => {
   const [selectedTenant, setSelectedTenant] = useState(""); // Updated to match dynamic tenants
   const [selectedChartType, setSelectedChartType] = useState("bar");
 
+
+const [xAxis, setXAxis] = useState(""); // X-Axis Label
+const [yAxis, setYAxis] = useState(""); // Y-Axis Label
+
+
+
+  const [queryValue, setQueryValue] = useState("");
+  const [columnNames, setColumnNames] = useState([]); // State to store extracted column names
+
+  const sqlParser = new Parser(); // Initialize the parser
+
+
+  const parseColumns = (query) => {
+    try {
+      const ast = sqlParser.astify(query, { database: "MySQL" }); // Parse SQL query into AST
+      const columns = [];
+  
+      // Check if the AST is a SELECT query
+      if (Array.isArray(ast)) {
+        throw new Error("Multiple queries are not supported.");
+      }
+  
+      if (ast.type === "select" && ast.columns) {
+        for (const column of ast.columns) {
+          // Ensure each column is a simple column reference
+          if (column.expr?.type === "column_ref" && !column.as) {
+            columns.push(column.expr.column); // Extract column names
+          } else {
+            console.warn("Ignored non-column reference:", column);
+          }
+        }
+      }
+  
+      return columns;
+    } catch (error) {
+      console.error("Error parsing query:", error.message);
+      return [];
+    }
+  };
+  
+  const handleQueryChange = (val) => {
+    setQueryValue(val);
+  };
+
+
   const role = localStorage.getItem("role");
 
   const editorRef = useRef();
@@ -51,10 +92,23 @@ const QueryBuilder = () => {
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
+    editor.onDidBlurEditorText(() => {
+      const query = editor.getValue();
+      const columns = parseColumns(query);
+  
+      console.log("Extracted Columns:", columns);
+      setColumnNames(columns);
+    });
   };
+  
 
   const fetchChartData = async () => {
     if (!queryValue) return;
+
+    if (queryValue.includes('*')) {
+      alert("Queries containing '*' are not allowed. Please specify the columns explicitly.");
+      return;
+    }
 
     try {
       setQueryLoading(true);
@@ -126,10 +180,32 @@ const QueryBuilder = () => {
           <p className="capitalize">
             {!!queryResponse?.length ? queryResponse[0]?.name : ""}
           </p>
-          <Chart
+          {/* <Chart
             options={
               selectedChartType === "line"
-                ? queryResponseChartLineOptions
+                ? {...queryResponseChartLineOptions,
+
+                  xaxis: {
+                    title: {
+                      text: xAxis || "X-Axis", // Use xAxis value or default
+                      style: {
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        color: "#333",
+                      },
+                    },
+                  },
+                  yaxis: {
+                    title: {
+                      text: yAxis || "Y-Axis", // Use yAxis value or default
+                      style: {
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        color: "#333",
+                      },
+                    },
+                  },
+                }
                 : queryResponseChartOptions
             }
             key={selectedChartType}
@@ -138,9 +214,48 @@ const QueryBuilder = () => {
                 ? queryResponse[0].data
                 : queryResponse
             }
+          
             type={selectedChartType}
             height="350"
-          />
+          //  xAxis={xAxis}
+          //  yAxis={yAxis}
+          /> */}
+            <Chart
+          options={{
+            ...queryResponseChartOptions,
+            chart: {
+              type: selectedChartType,
+            },
+            xaxis: {
+              title: {
+                text: xAxis || "X-Axis", // Use xAxis value or default
+                style: {
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  color: "#333",
+                },
+              },
+            },
+            yaxis: {
+              title: {
+                text: yAxis || "Y-Axis", // Use yAxis value or default
+                style: {
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  color: "#333",
+                },
+              },
+            },
+          }}
+          key={selectedChartType}
+          series={
+            selectedChartType === "pie"
+              ? queryResponse[0].data
+              : queryResponse
+          }
+          type={selectedChartType}
+          height="350"
+        />
         </div>
       ) : null;
     }
@@ -168,20 +283,21 @@ const QueryBuilder = () => {
             </div>
             <section className="flex items-start">
               <div className="w-[97%]">
-                <Editor
-                  options={options}
-                  height="45vh"
-                  width="100%"
-                  theme="myTheme"
-                  className="bg-gray-100"
-                  defaultLanguage="sql"
-                  onMount={onMount}
-                  value={queryValue}
-                  onChange={(val) => {
-                    setQueryValue(val);
-                  }}
-                />
+                  <Editor
+                options={{
+                  minimap: { enabled: false },
+                }}
+                height="45vh"
+                width="100%"
+                theme="myTheme"
+                className="bg-gray-100"
+                defaultLanguage="sql"
+                onMount={onMount}
+                value={queryValue}
+                onChange={handleQueryChange} // Parse columns on change
+              />
               </div>
+             
               <div className="flex flex-col gap-5 py-2 items-center pe-4">
                 {editorEvents.map((item, index) => (
                   <div key={index}>
@@ -243,7 +359,12 @@ const QueryBuilder = () => {
         isOpen={queryBuilderTab === queryBuilderTabEnum.SETTING}
         onClose={() => setQueryBuilderTab("")}
       >
-        <SettingDrawer onClose={() => setQueryBuilderTab("")} />
+        <SettingDrawer onClose={() => setQueryBuilderTab("")}
+        columnNames= {columnNames}
+        xAxis={xAxis}
+  setXAxis={setXAxis}
+  yAxis={yAxis}
+  setYAxis={setYAxis} />
       </CustomFlyoutModal>
     </div>
   );
