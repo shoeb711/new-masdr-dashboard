@@ -2,22 +2,25 @@ import SettingDataContent from "components/settingDataContent/SettingDataContent
 import SettingDisplayContent from "components/settingDisplayContent/SettingDisplayContent";
 import { useState } from "react";
 
-const tabs = [{ name: "data" }, { name: "display" }, { name: "axes" }];
+const tabs = [{ name: "data" }, { name: "display" }];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const SettingDrawer = ({ onClose }) => {
+const SettingDrawer = ({ onClose , columnNames=[] ,xAxis,setXAxis,yAxis,setYAxis }) => {
   const [selectedSettingTab, setSelectedSettingTab] = useState("data");
 
   const renderSettingDrawerContent = (tab) => {
     switch (tab) {
       case "data":
-        return <SettingDataContent />;
+        return <SettingDataContent columnNames={columnNames} />;
 
       case "display":
-        return <SettingDisplayContent />;
+        return <SettingDisplayContent  xAxis={xAxis}
+        setXAxis={setXAxis}
+        yAxis={yAxis}
+        setYAxis={setYAxis} />;
 
       case "axes":
         return <div>Axes content</div>;

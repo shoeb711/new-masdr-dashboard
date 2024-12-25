@@ -79,7 +79,7 @@ export const options = {
   },
 };
 
-export const queryResponseChartOptions = {
+export const queryResponseChartOptions ={
   chart: {
     zoom: {
       enabled: false,
@@ -126,6 +126,26 @@ export const queryResponseChartLineOptions = {
     type: "line",
     zoom: {
       enabled: false,
+    },
+  },
+  xaxis: {
+    title: {
+      text: "X-Axis Label", // Label for the X-axis
+      style: {
+        fontSize: "14px",
+        fontWeight: "bold",
+        color: "#333",
+      },
+    },
+  },
+  yaxis: {
+    title: {
+      text: "Y-Axis Label", // Label for the Y-axis
+      style: {
+        fontSize: "14px",
+        fontWeight: "bold",
+        color: "#333",
+      },
     },
   },
 
