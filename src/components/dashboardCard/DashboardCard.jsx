@@ -4,6 +4,7 @@ import { PATH, userRole } from "shared/constant";
 import { options } from "shared/helper";
 import { masdrDevApi } from "shared/axios";
 import { useEffect, useState } from "react";
+import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
 
 const DashboardCard = (props) => {
   const { selectedTenant, query, graphName, graphId, graphType } = props;
@@ -54,7 +55,7 @@ const DashboardCard = (props) => {
 
   const renderChartData = () => {
     if (queryLoading) {
-      return <p>Loading...</p>;
+      return <PrimaryLoader />;
     } else if (queryError) {
       return <p>Something went wrong.</p>;
     } else {
@@ -74,7 +75,7 @@ const DashboardCard = (props) => {
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">
       {/* <div className="px-4 py-5 sm:p-6 grid md:grid-cols-2 gap-8"> */}
-      <div className="flex flex-col gap-3 items-end border border-gray-200 rounded-lg p-2">
+      <div className="flex flex-col gap-3 border border-gray-200 rounded-lg p-2">
         <div className="flex items-center justify-between w-full">
           <h3 className="text-base font-semibold text-gray-900">{graphName}</h3>
           <button
