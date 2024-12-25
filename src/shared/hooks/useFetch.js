@@ -7,7 +7,12 @@ export const useFetch = (baseURl, url, refetchList) => {
 
   const fetchData = async (isMounted) => {
     try {
-      const response = await baseURl.get(url, {});
+      const response = await baseURl.get(url, {
+        headers: {
+          "ngrok-skip-browser-warning": true,
+        },
+      });
+
       if (isMounted) {
         setData(response.data);
         setError(null);
