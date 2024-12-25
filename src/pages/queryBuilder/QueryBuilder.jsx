@@ -59,10 +59,15 @@ const QueryBuilder = () => {
     try {
       setQueryLoading(true);
 
-      const response = await masdrDevApi.post("query-runner/run", {
-        query: queryValue,
-        tenant: selectedTenant,
-      });
+      const response = await masdrDevApi.post(
+        role === userRole.SUPER_ADMIN
+          ? `query-runner/run?paramTenantId=${selectedTenant}`
+          : "query-runner/run",
+        {
+          query: queryValue,
+          tenant: selectedTenant,
+        }
+      );
 
       console.log("response =>", response.data);
       const seriesData = response?.data?.result?.map((item) => item.productId);
@@ -184,7 +189,7 @@ const QueryBuilder = () => {
                       onClick={() => {
                         if (item.name === "Run Query") {
                           fetchChartData();
-                          return
+                          return;
                         } else if (editorRef.current && item.action) {
                           item.action(editorRef.current);
                         }
