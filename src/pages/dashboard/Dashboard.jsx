@@ -53,16 +53,18 @@ const Dashboard = () => {
       return <PrimaryLoader />;
     } else {
       return (
-        selectedTenant &&
-        graphData?.map((item, idx) => {
-          return (
-            <DashboardCard
-              key={idx}
-              {...item}
-              selectedTenant={selectedTenant}
-            />
-          );
-        })
+        <div className="grid md:grid-cols-2 gap-8">
+          {selectedTenant &&
+            graphData?.map((item, idx) => {
+              return (
+                <DashboardCard
+                  key={idx}
+                  {...item}
+                  selectedTenant={selectedTenant}
+                />
+              );
+            })}
+        </div>
       );
     }
   };
@@ -79,7 +81,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">{renderDashboardCard()}</div>
+      {renderDashboardCard()}
     </div>
   );
 };
