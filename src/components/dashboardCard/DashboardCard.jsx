@@ -7,7 +7,17 @@ import { useEffect, useState } from "react";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
 
 const DashboardCard = (props) => {
-  const { selectedTenant, query, graphName, graphId, graphType } = props;
+  const {
+    selectedTenant,
+    query,
+    graphName,
+    graphId,
+    graphType,
+    xAxisColumnName,
+    yAxisColumnName,
+    xAxisLable,
+    yAxisLabel,
+  } = props;
 
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState(false);
@@ -62,7 +72,7 @@ const DashboardCard = (props) => {
       return (
         <div className="w-full" key={graphId}>
           <Chart
-            series={graphType === "pie" ? queryResponse[0].data : queryResponse}
+            series={graphType === "pie" ? queryResponse[0]?.data : queryResponse}
             options={options}
             type={graphType}
             height={300}
@@ -85,6 +95,15 @@ const DashboardCard = (props) => {
               navigate(`${PATH.editqueryBuilder}/${graphId}`, {
                 state: {
                   singleChartData: queryResponse,
+                  selectedTenant: selectedTenant,
+                  query: query,
+                  graphName: graphName,
+                  graphId: graphId,
+                  graphType: graphType,
+                  xAxisColumnName: xAxisColumnName,
+                  yAxisColumnName: yAxisColumnName,
+                  xAxisLable: xAxisLable,
+                  yAxisLabel: yAxisLabel,
                 },
               })
             }

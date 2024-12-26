@@ -1,3 +1,7 @@
+import { Parser } from "node-sql-parser"; // Import the SQL parser
+
+const sqlParser = new Parser(); // Initialize the parser
+
 import {
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
@@ -22,7 +26,7 @@ export const options = {
       },
     },
   },
- 
+
   yaxis: {
     axisBorder: {
       show: false,
@@ -42,7 +46,7 @@ export const options = {
   },
 };
 
-export const queryResponseChartOptions ={
+export const queryResponseChartOptions = {
   chart: {
     zoom: {
       enabled: false,
@@ -90,30 +94,6 @@ export const queryResponseChartLineOptions = {
     zoom: {
       enabled: false,
     },
-  },
-  xaxis: {
-    title: {
-      text: "X-Axis Label", // Label for the X-axis
-      style: {
-        fontSize: "14px",
-        fontWeight: "bold",
-        color: "#333",
-      },
-    },
-  },
-  yaxis: {
-    title: {
-      text: "Y-Axis Label", // Label for the Y-axis
-      style: {
-        fontSize: "14px",
-        fontWeight: "bold",
-        color: "#333",
-      },
-    },
-  },
-
-  dataLabels: {
-    enabled: false,
   },
   // stroke: {
   //   show: true,
@@ -168,3 +148,31 @@ export const editorEvents = [
     icon: PlayIcon,
   },
 ];
+
+export const parseColumns = (query) => {
+  try {
+    const ast = sqlParser.astify(query, { database: "MySQL" }); // Parse SQL query into AST
+    const columns = [];
+
+    // Check if the AST is a SELECT query
+    if (Array.isArray(ast)) {
+      throw new Error("Multiple queries are not supported.");
+    }
+
+    if (ast.type === "select" && ast.columns) {
+      for (const column of ast.columns) {
+        // Ensure each column is a simple column reference
+        if (column.expr?.type === "column_ref" && !column.as) {
+          columns.push(column.expr.column); // Extract column names
+        } else {
+          console.warn("Ignored non-column reference:", column);
+        }
+      }
+    }
+
+    return columns;
+  } catch (error) {
+    console.error("Error parsing query:", error.message);
+    return [];
+  }
+};
