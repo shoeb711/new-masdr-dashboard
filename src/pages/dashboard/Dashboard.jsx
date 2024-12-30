@@ -1,69 +1,68 @@
 import DashboardCard from "components/dashboardCard/DashboardCard";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { masdrDevApi } from "shared/axios";
 import Dropdown from "shared/components/customInput/DropDown";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
 import { userRole } from "shared/constant";
-import { useFetch } from "shared/hooks/useFetch";
+import { GlobalContext } from "shared/context/GlobalContext";
 
 const Dashboard = () => {
   const role = localStorage.getItem("role");
+  const {
+    currentState,
+    selectedTenant,
+    setSelectedTenant,
+    isLoading,
+  } = useContext(GlobalContext);
 
   const [tenants, setTenants] = useState([]);
-  const [selectedTenant, setSelectedTenant] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const { data } = useFetch(
-    masdrDevApi,
-    `/currentstate/getcurrentstate?paramTenantId=${selectedTenant}`
-  );
-  const graphData = data?.data?.graphList;
+  const [loadingTenants, setLoadingTenants] = useState(false);
 
   useEffect(() => {
     const fetchTenants = async () => {
       try {
-        setLoading(true);
+        setLoadingTenants(true);
         const res = await masdrDevApi.get("/tenant/tenantlist", {
           headers: {
-            "ngrok-skip-browser-warning": true, // Custom header
+            "ngrok-skip-browser-warning": true,
           },
         });
         const tenantList = res?.data?.data?.map((tenant) => ({
-          label: tenant.tenantId, // Use tenantId as the label
-          type: "button", // Define button type
-          action: () => setSelectedTenant(tenant.tenantId), // Update selected tenant
+          label: tenant.tenantId,
+          type: "button",
+          action: () => setSelectedTenant(tenant.tenantId),
         }));
 
-        setTenants(tenantList); // Update tenants with dynamic data
-        if (tenantList.length > 0) {
-          setSelectedTenant(tenantList[0].label); // Default to the first tenant
+        setTenants(tenantList);
+        console.log("tenantList", tenantList);
+        
+        if (tenantList.length > 0 && !selectedTenant) {
+          setSelectedTenant(tenantList[0].label);
         }
       } catch (error) {
         console.error("Error fetching tenant list:", error);
       } finally {
-        setLoading(false);
+        setLoadingTenants(false);
       }
     };
 
     fetchTenants();
-  }, []);
+  }, [setSelectedTenant, selectedTenant]);
 
   const renderDashboardCard = () => {
-    if (loading) {
+    if (loadingTenants || isLoading) {
       return <PrimaryLoader />;
     } else {
       return (
         <div className="grid md:grid-cols-2 gap-8">
           {selectedTenant &&
-            graphData?.map((item, idx) => {
-              return (
-                <DashboardCard
-                  key={idx}
-                  {...item}
-                  selectedTenant={selectedTenant}
-                />
-              );
-            })}
+            currentState?.map((item, idx) => (
+              <DashboardCard
+                key={idx}
+                {...item}
+                selectedTenant={selectedTenant}
+              />
+            ))}
         </div>
       );
     }
