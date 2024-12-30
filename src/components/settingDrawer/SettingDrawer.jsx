@@ -8,16 +8,21 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const SettingDrawer = ({ onClose , columnNames=[] ,xAxis,setXAxis,yAxis,setYAxis }) => {
+const SettingDrawer = ({ selectedXAxisCol,setSelectedXAxisCol,selectedYAxisCol, setSelectedYAxisCol,onClose , columnNames=[] ,xAxis,setXAxis,yAxis,setYAxis }) => {
   const [selectedSettingTab, setSelectedSettingTab] = useState("data");
 
   const renderSettingDrawerContent = (tab) => {
     switch (tab) {
       case "data":
-        return <SettingDataContent columnNames={columnNames} />;
+        return <SettingDataContent onClose={onClose}
+        selectedXAxisCol={selectedXAxisCol}
+        setSelectedXAxisCol={setSelectedXAxisCol}
+        selectedYAxisCol={selectedYAxisCol}
+        setSelectedYAxisCol={setSelectedYAxisCol}
+         columnNames={columnNames} />;
 
       case "display":
-        return <SettingDisplayContent  xAxis={xAxis}
+        return <SettingDisplayContent onClose={onClose} xAxis={xAxis}
         setXAxis={setXAxis}
         yAxis={yAxis}
         setYAxis={setYAxis} />;
@@ -29,6 +34,19 @@ const SettingDrawer = ({ onClose , columnNames=[] ,xAxis,setXAxis,yAxis,setYAxis
         break;
     }
   };
+  // const handleSubmit = () => {
+  //   if (!selectedXAxisCol || !selectedYAxisCol) {
+  //     setErrorMessage("Please select both X-axis and Y-axis.");
+  //     return;
+  //   }
+
+  //   if (selectedXAxisCol === selectedYAxisCol) {
+  //     setErrorMessage("X-axis and Y-axis cannot be the same.");
+  //     return;
+  //   }
+
+  //   alert(`Selections are valid! X-axis: ${selectedXAxisCol}, Y-axis: ${selectedYAxisCol}`);
+  // };
 
   return (
     <div className="flex flex-col justify-between h-full">
@@ -60,11 +78,6 @@ const SettingDrawer = ({ onClose , columnNames=[] ,xAxis,setXAxis,yAxis,setYAxis
         </div>
       </div>
 
-      <div className="flex justify-center">
-        <button className="btn-primary w-48" onClick={onClose}>
-          Done
-        </button>
-      </div>
     </div>
   );
 };
