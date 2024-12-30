@@ -3,7 +3,7 @@ import { Editor, loader } from "@monaco-editor/react";
 import QueryBuilderTab from "components/queryBuilderTab/QueryBuilderTab";
 import SettingDrawer from "components/settingDrawer/SettingDrawer";
 import VisualizationDrawer from "components/visualizationDrawer/VisualizationDrawer";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import Chart from "react-apexcharts";
 import { useLocation, useNavigate } from "react-router-dom";
 import { masdrDevApi } from "shared/axios";
@@ -12,6 +12,7 @@ import Dropdown from "shared/components/customInput/DropDown";
 import InputField from "shared/components/customInput/InputField";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
 import { PATH, queryBuilderTabEnum, userRole } from "shared/constant";
+import { GlobalContext } from "shared/context/GlobalContext";
 import {
   editorEvents,
   parseColumns,
@@ -47,13 +48,15 @@ const EditQueryBuilder = () => {
     graphId,
     graphType,
     singleChartData,
-    // xAxisColumnName,
-    // yAxisColumnName,
+    xAxisColumnName,
+    yAxisColumnName,
     xAxisLable,
     yAxisLabel,
   } = state;
 
   console.log("state =>", state);
+
+  const { currentState, setCurrentState } = useContext(GlobalContext);
 
   const [queryValue, setQueryValue] = useState(!!query ? query : "");
   const [queryLoading, setQueryLoading] = useState(false);
@@ -71,6 +74,12 @@ const EditQueryBuilder = () => {
   const [xAxis, setXAxis] = useState(!!xAxisLable ? xAxisLable : ""); // X-Axis Label
   const [yAxis, setYAxis] = useState(!!yAxisLabel ? yAxisLabel : ""); // Y-Axis Label
   const [columnNames, setColumnNames] = useState([]); // State to store extracted column names
+  const [selectedXAxisCol, setSelectedXAxisCol] = useState(
+    !!xAxisColumnName ? xAxisColumnName : ""
+  );
+  const [selectedYAxisCol, setSelectedYAxisCol] = useState(
+    !!yAxisColumnName ? yAxisColumnName : ""
+  );
 
   const role = localStorage.getItem("role");
 
@@ -92,12 +101,76 @@ const EditQueryBuilder = () => {
   const fetchChartData = async () => {
     if (!queryValue) return;
 
+    if (queryValue.includes("*")) {
+      alert(
+        "Queries containing '*' are not allowed. Please specify the columns explicitly."
+      );
+      return;
+    }
+
+    const editData = {
+      globalConfiguration: {},
+      graphList: [
+        ...currentState,
+        {
+          graphType: selectedChartType,
+          query: queryValue,
+          config: {
+            colour: "#ff6361",
+          },
+          graphId: graphId,
+          graphName: chartInputValue,
+          xAxisLable: xAxis,
+          yAxisLabel: yAxis,
+          xAxisColumnName: selectedXAxisCol,
+          yAxisColumnName: selectedYAxisCol,
+        },
+      ],
+    };
+
     try {
       setQueryLoading(true);
 
-      const response = await masdrDevApi.post("query-runner/run", {
-        query: queryValue,
+      const response = await masdrDevApi.post(
+        role === userRole.SUPER_ADMIN
+          ? `query-runner/run?paramTenantId=${selectedTenant}`
+          : "query-runner/run",
+        {
+          query: queryValue,
+          tenant: selectedTenant,
+        },
+        {
+          headers: {
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+
+      const putRes = await masdrDevApi.put(
+        `/currentstate/updatecurrentstate?paramTenantId=${selectedTenant}`,
+        editData
+      );
+
+      console.log("putRes", putRes);
+
+      // match graphId in the currentState's array and update that particular object usif setCurrentState(currenstState is the useState's setState function which takes an updated array)
+      const updatedState = currentState.map((item) => {
+        if (item.graphId === graphId) {
+          return {
+            ...item,
+            graphType: selectedChartType,
+            query: queryValue,
+            graphName: chartInputValue,
+            xAxisLable: xAxis,
+            yAxisLabel: yAxis,
+            xAxisColumnName: selectedXAxisCol,
+            yAxisColumnName: selectedYAxisCol,
+          };
+        }
+        return item;
       });
+
+      setCurrentState(updatedState);
 
       const seriesData = response?.data?.result?.map((item) => item.productId); // Y-axis values
 
@@ -253,7 +326,6 @@ const EditQueryBuilder = () => {
                   {item.name === "Run Query" ? (
                     <div>
                       <button
-                        onClick={fetchChartData}
                         className="btn-primary bg-indigo-600 hover:bg-indigo-500 text-gray-700 w-full flex justify-center items-center rounded-md h-9 p-1"
                         title="Submit"
                       >
@@ -302,6 +374,10 @@ const EditQueryBuilder = () => {
           setXAxis={setXAxis}
           yAxis={yAxis}
           setYAxis={setYAxis}
+          selectedXAxisCol={selectedXAxisCol}
+          setSelectedXAxisCol={setSelectedXAxisCol}
+          selectedYAxisCol={selectedYAxisCol}
+          setSelectedYAxisCol={setSelectedYAxisCol}
         />
       </CustomFlyoutModal>
     </div>
