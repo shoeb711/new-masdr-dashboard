@@ -48,8 +48,8 @@ const EditQueryBuilder = () => {
     graphId,
     graphType,
     singleChartData,
-    // xAxisColumnName,
-    // yAxisColumnName,
+    xAxisColumnName,
+    yAxisColumnName,
     xAxisLable,
     yAxisLabel,
   } = state;
@@ -57,7 +57,6 @@ const EditQueryBuilder = () => {
   console.log("state =>", state);
 
   const { currentState, setCurrentState } = useContext(GlobalContext);
-  console.log("currentState =>", currentState);
 
   const [queryValue, setQueryValue] = useState(!!query ? query : "");
   const [queryLoading, setQueryLoading] = useState(false);
@@ -75,6 +74,12 @@ const EditQueryBuilder = () => {
   const [xAxis, setXAxis] = useState(!!xAxisLable ? xAxisLable : ""); // X-Axis Label
   const [yAxis, setYAxis] = useState(!!yAxisLabel ? yAxisLabel : ""); // Y-Axis Label
   const [columnNames, setColumnNames] = useState([]); // State to store extracted column names
+  const [selectedXAxisCol, setSelectedXAxisCol] = useState(
+    !!xAxisColumnName ? xAxisColumnName : ""
+  );
+  const [selectedYAxisCol, setSelectedYAxisCol] = useState(
+    !!yAxisColumnName ? yAxisColumnName : ""
+  );
 
   const role = localStorage.getItem("role");
 
@@ -117,8 +122,8 @@ const EditQueryBuilder = () => {
           graphName: chartInputValue,
           xAxisLable: xAxis,
           yAxisLabel: yAxis,
-          xAxisColumnName: "Name",
-          yAxisColumnName: "Age",
+          xAxisColumnName: selectedXAxisCol,
+          yAxisColumnName: selectedYAxisCol,
         },
       ],
     };
@@ -158,8 +163,8 @@ const EditQueryBuilder = () => {
             graphName: chartInputValue,
             xAxisLable: xAxis,
             yAxisLabel: yAxis,
-            xAxisColumnName: "Name",
-            yAxisColumnName: "Age",
+            xAxisColumnName: selectedXAxisCol,
+            yAxisColumnName: selectedYAxisCol,
           };
         }
         return item;
@@ -369,6 +374,10 @@ const EditQueryBuilder = () => {
           setXAxis={setXAxis}
           yAxis={yAxis}
           setYAxis={setYAxis}
+          selectedXAxisCol={selectedXAxisCol}
+          setSelectedXAxisCol={setSelectedXAxisCol}
+          selectedYAxisCol={selectedYAxisCol}
+          setSelectedYAxisCol={setSelectedYAxisCol}
         />
       </CustomFlyoutModal>
     </div>

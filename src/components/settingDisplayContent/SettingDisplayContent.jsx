@@ -27,19 +27,22 @@ const InputField = ({
   );
 };
 
-const SettingDisplayContent = ({ xAxis, setXAxis, yAxis, setYAxis, onClose }) => {
-  const [tempXAxis, setTempXAxis] = useState(xAxis);
-  const [tempYAxis, setTempYAxis] = useState(yAxis);
+const SettingDisplayContent = ({
+  xAxis,
+  setXAxis,
+  yAxis,
+  setYAxis,
+  onClose,
+}) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = () => {
-    if (!tempXAxis || !tempYAxis) {
+    if (!xAxis || !xAxis) {
       setErrorMessage("Please fill in both X-axis and Y-axis.");
       return false; // Return false to indicate invalid input
     }
     setErrorMessage(""); // Clear error if valid
-    setXAxis(tempXAxis);
-    setYAxis(tempYAxis);
+
     return true; // Return true to indicate valid input
   };
 
@@ -58,8 +61,8 @@ const SettingDisplayContent = ({ xAxis, setXAxis, yAxis, setYAxis, onClose }) =>
             id="x-axis"
             name="xAxis"
             placeholder="Enter X-Axis value"
-            value={tempXAxis}
-            onChange={(e) => setTempXAxis(e.target.value)}
+            value={xAxis}
+            onChange={(e) => setXAxis(e.target.value)}
           />
         </div>
 
@@ -74,8 +77,8 @@ const SettingDisplayContent = ({ xAxis, setXAxis, yAxis, setYAxis, onClose }) =>
             id="y-axis"
             name="yAxis"
             placeholder="Enter Y-Axis value"
-            value={tempYAxis}
-            onChange={(e) => setTempYAxis(e.target.value)}
+            value={yAxis}
+            onChange={(e) => setYAxis(e.target.value)}
           />
         </div>
       </div>
