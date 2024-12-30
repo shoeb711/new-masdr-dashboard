@@ -2,22 +2,30 @@ import SettingDataContent from "components/settingDataContent/SettingDataContent
 import SettingDisplayContent from "components/settingDisplayContent/SettingDisplayContent";
 import { useState } from "react";
 
-const tabs = [{ name: "data" }, { name: "display" }, { name: "axes" }];
+const tabs = [{ name: "data" }, { name: "display" }];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const SettingDrawer = ({ onClose }) => {
+const SettingDrawer = ({ selectedXAxisCol,setSelectedXAxisCol,selectedYAxisCol, setSelectedYAxisCol,onClose , columnNames=[] ,xAxis,setXAxis,yAxis,setYAxis }) => {
   const [selectedSettingTab, setSelectedSettingTab] = useState("data");
 
   const renderSettingDrawerContent = (tab) => {
     switch (tab) {
       case "data":
-        return <SettingDataContent />;
+        return <SettingDataContent onClose={onClose}
+        selectedXAxisCol={selectedXAxisCol}
+        setSelectedXAxisCol={setSelectedXAxisCol}
+        selectedYAxisCol={selectedYAxisCol}
+        setSelectedYAxisCol={setSelectedYAxisCol}
+         columnNames={columnNames} />;
 
       case "display":
-        return <SettingDisplayContent />;
+        return <SettingDisplayContent onClose={onClose} xAxis={xAxis}
+        setXAxis={setXAxis}
+        yAxis={yAxis}
+        setYAxis={setYAxis} />;
 
       case "axes":
         return <div>Axes content</div>;
@@ -26,6 +34,7 @@ const SettingDrawer = ({ onClose }) => {
         break;
     }
   };
+ 
 
   return (
     <div className="flex flex-col justify-between h-full">
@@ -57,11 +66,6 @@ const SettingDrawer = ({ onClose }) => {
         </div>
       </div>
 
-      <div className="flex justify-center">
-        <button className="btn-primary w-48" onClick={onClose}>
-          Done
-        </button>
-      </div>
     </div>
   );
 };

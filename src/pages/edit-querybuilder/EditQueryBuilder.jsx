@@ -3,17 +3,19 @@ import { Editor, loader } from "@monaco-editor/react";
 import QueryBuilderTab from "components/queryBuilderTab/QueryBuilderTab";
 import SettingDrawer from "components/settingDrawer/SettingDrawer";
 import VisualizationDrawer from "components/visualizationDrawer/VisualizationDrawer";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import Chart from "react-apexcharts";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { masdrDevApi } from "shared/axios";
 import CustomFlyoutModal from "shared/components/customFlyoutModal/CustomFlyoutModal";
 import Dropdown from "shared/components/customInput/DropDown";
 import InputField from "shared/components/customInput/InputField";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
 import { PATH, queryBuilderTabEnum, userRole } from "shared/constant";
+import { GlobalContext } from "shared/context/GlobalContext";
 import {
   editorEvents,
+  parseColumns,
   queryResponseChartLineOptions,
   queryResponseChartOptions,
 } from "shared/helper";
@@ -37,25 +39,46 @@ loader.init().then((monaco) => {
 
 const EditQueryBuilder = () => {
   const navigate = useNavigate();
-  const { chartId } = useParams();
-  const {
-    state: { singleChartData },
-  } = useLocation();
+  const { state } = useLocation();
 
-  const [queryValue, setQueryValue] = useState(
-    !!singleChartData[0]?.queryValue ? singleChartData[0]?.queryValue : ""
-  );
+  const {
+    selectedTenant,
+    query,
+    graphName,
+    graphId,
+    graphType,
+    singleChartData,
+    xAxisColumnName,
+    yAxisColumnName,
+    xAxisLable,
+    yAxisLabel,
+  } = state;
+
+  console.log("state =>", state);
+
+  const { currentState, setCurrentState } = useContext(GlobalContext);
+
+  const [queryValue, setQueryValue] = useState(!!query ? query : "");
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState(false);
   const [queryBuilderTab, setQueryBuilderTab] = useState("");
   const [selectedChartType, setSelectedChartType] = useState(
-    !!singleChartData[0].chartType ? singleChartData[0].chartType : "bar"
+    !!graphType ? graphType : "bar"
   );
   const [queryResponse, setQueryResponse] = useState(
     !!singleChartData?.length ? singleChartData : []
   );
   const [chartInputValue, setChartInputValue] = useState(
-    !!singleChartData[0]?.name ? singleChartData[0]?.name : ""
+    !!graphName ? graphName : ""
+  );
+  const [xAxis, setXAxis] = useState(!!xAxisLable ? xAxisLable : ""); // X-Axis Label
+  const [yAxis, setYAxis] = useState(!!yAxisLabel ? yAxisLabel : ""); // Y-Axis Label
+  const [columnNames, setColumnNames] = useState([]); // State to store extracted column names
+  const [selectedXAxisCol, setSelectedXAxisCol] = useState(
+    !!xAxisColumnName ? xAxisColumnName : ""
+  );
+  const [selectedYAxisCol, setSelectedYAxisCol] = useState(
+    !!yAxisColumnName ? yAxisColumnName : ""
   );
 
   const role = localStorage.getItem("role");
@@ -65,17 +88,89 @@ const EditQueryBuilder = () => {
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
+
+    editor.onDidBlurEditorText(() => {
+      const query = editor.getValue();
+      const columns = parseColumns(query);
+
+      console.log("Extracted Columns:", columns);
+      setColumnNames(columns);
+    });
   };
 
   const fetchChartData = async () => {
     if (!queryValue) return;
 
+    if (queryValue.includes("*")) {
+      alert(
+        "Queries containing '*' are not allowed. Please specify the columns explicitly."
+      );
+      return;
+    }
+
+    const editData = {
+      globalConfiguration: {},
+      graphList: [
+        ...currentState,
+        {
+          graphType: selectedChartType,
+          query: queryValue,
+          config: {
+            colour: "#ff6361",
+          },
+          graphId: graphId,
+          graphName: chartInputValue,
+          xAxisLable: xAxis,
+          yAxisLabel: yAxis,
+          xAxisColumnName: selectedXAxisCol,
+          yAxisColumnName: selectedYAxisCol,
+        },
+      ],
+    };
+
     try {
       setQueryLoading(true);
 
-      const response = await masdrDevApi.post("query-runner/run", {
-        query: queryValue,
+      const response = await masdrDevApi.post(
+        role === userRole.SUPER_ADMIN
+          ? `query-runner/run?paramTenantId=${selectedTenant}`
+          : "query-runner/run",
+        {
+          query: queryValue,
+          tenant: selectedTenant,
+        },
+        {
+          headers: {
+            "ngrok-skip-browser-warning": true,
+          },
+        }
+      );
+
+      const putRes = await masdrDevApi.put(
+        `/currentstate/updatecurrentstate?paramTenantId=${selectedTenant}`,
+        editData
+      );
+
+      console.log("putRes", putRes);
+
+      // match graphId in the currentState's array and update that particular object usif setCurrentState(currenstState is the useState's setState function which takes an updated array)
+      const updatedState = currentState.map((item) => {
+        if (item.graphId === graphId) {
+          return {
+            ...item,
+            graphType: selectedChartType,
+            query: queryValue,
+            graphName: chartInputValue,
+            xAxisLable: xAxis,
+            yAxisLabel: yAxis,
+            xAxisColumnName: selectedXAxisCol,
+            yAxisColumnName: selectedYAxisCol,
+          };
+        }
+        return item;
       });
+
+      setCurrentState(updatedState);
 
       const seriesData = response?.data?.result?.map((item) => item.productId); // Y-axis values
 
@@ -94,11 +189,6 @@ const EditQueryBuilder = () => {
     }
   };
 
-  useEffect(() => {
-    if (queryResponse[0]?.chartType)
-      setSelectedChartType(queryResponse[0].chartType);
-  }, [queryResponse]);
-
   const renderQueryOutput = () => {
     if (queryLoading) {
       return <PrimaryLoader />;
@@ -109,13 +199,57 @@ const EditQueryBuilder = () => {
         <div className="pt-10">
           <p className="capitalize">
             {!!queryResponse?.length ? queryResponse[0]?.name : ""} for ID:{" "}
-            {chartId}
+            {graphId}
           </p>
           <Chart
             options={
               selectedChartType === "line"
-                ? queryResponseChartLineOptions
-                : queryResponseChartOptions
+                ? {
+                    ...queryResponseChartLineOptions,
+                    xaxis: {
+                      title: {
+                        text: xAxis || "",
+                        style: {
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          color: "#333",
+                        },
+                      },
+                    },
+                    yaxis: {
+                      title: {
+                        text: yAxis || "",
+                        style: {
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          color: "#333",
+                        },
+                      },
+                    },
+                  }
+                : {
+                    ...queryResponseChartOptions,
+                    xaxis: {
+                      title: {
+                        text: xAxis || "",
+                        style: {
+                          fontSize: "14px",
+                          fontWeight: "semibold",
+                          color: "#333",
+                        },
+                      },
+                    },
+                    yaxis: {
+                      title: {
+                        text: yAxis || "",
+                        style: {
+                          fontSize: "14px",
+                          fontWeight: "semibold",
+                          color: "#333",
+                        },
+                      },
+                    },
+                  }
             }
             key={selectedChartType}
             series={
@@ -135,7 +269,7 @@ const EditQueryBuilder = () => {
     <div>
       <div className="flex justify-between items-center p-4">
         <h1 className="text-lg font-bold">
-          Edit Query Builder for ID: {chartId}
+          Edit Query Builder for ID: {graphId}
         </h1>
         {role === userRole.SUPER_ADMIN && (
           <div className="flex items-center gap-4">
@@ -145,7 +279,7 @@ const EditQueryBuilder = () => {
             >
               Add new query
             </button>
-            <Dropdown buttonText={singleChartData[0]?.tenantName} />
+            <Dropdown buttonText={selectedTenant} />
           </div>
         )}
       </div>
@@ -192,7 +326,6 @@ const EditQueryBuilder = () => {
                   {item.name === "Run Query" ? (
                     <div>
                       <button
-                        onClick={fetchChartData}
                         className="btn-primary bg-indigo-600 hover:bg-indigo-500 text-gray-700 w-full flex justify-center items-center rounded-md h-9 p-1"
                         title="Submit"
                       >
@@ -234,7 +367,18 @@ const EditQueryBuilder = () => {
         isOpen={queryBuilderTab === queryBuilderTabEnum.SETTING}
         onClose={() => setQueryBuilderTab("")}
       >
-        <SettingDrawer onClose={() => setQueryBuilderTab("")} />
+        <SettingDrawer
+          onClose={() => setQueryBuilderTab("")}
+          columnNames={columnNames}
+          xAxis={xAxis}
+          setXAxis={setXAxis}
+          yAxis={yAxis}
+          setYAxis={setYAxis}
+          selectedXAxisCol={selectedXAxisCol}
+          setSelectedXAxisCol={setSelectedXAxisCol}
+          selectedYAxisCol={selectedYAxisCol}
+          setSelectedYAxisCol={setSelectedYAxisCol}
+        />
       </CustomFlyoutModal>
     </div>
   );

@@ -1,3 +1,7 @@
+import { Parser } from "node-sql-parser"; // Import the SQL parser
+
+const sqlParser = new Parser(); // Initialize the parser
+
 import {
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
@@ -22,44 +26,7 @@ export const options = {
       },
     },
   },
-  xaxis: {
-    categories: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-    position: "bottom",
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
-    crosshairs: {
-      fill: {
-        type: "gradient",
-        gradient: {
-          colorFrom: "#D8E3F0",
-          colorTo: "#BED1E6",
-          stops: [0, 100],
-          opacityFrom: 0.4,
-          opacityTo: 0.5,
-        },
-      },
-    },
-    tooltip: {
-      enabled: true,
-    },
-  },
+
   yaxis: {
     axisBorder: {
       show: false,
@@ -128,10 +95,6 @@ export const queryResponseChartLineOptions = {
       enabled: false,
     },
   },
-
-  dataLabels: {
-    enabled: false,
-  },
   // stroke: {
   //   show: true,
   //   width: 2,
@@ -185,3 +148,31 @@ export const editorEvents = [
     icon: PlayIcon,
   },
 ];
+
+export const parseColumns = (query) => {
+  try {
+    const ast = sqlParser.astify(query, { database: "MySQL" }); // Parse SQL query into AST
+    const columns = [];
+
+    // Check if the AST is a SELECT query
+    if (Array.isArray(ast)) {
+      throw new Error("Multiple queries are not supported.");
+    }
+
+    if (ast.type === "select" && ast.columns) {
+      for (const column of ast.columns) {
+        // Ensure each column is a simple column reference
+        if (column.expr?.type === "column_ref" && !column.as) {
+          columns.push(column.expr.column); // Extract column names
+        } else {
+          console.warn("Ignored non-column reference:", column);
+        }
+      }
+    }
+
+    return columns;
+  } catch (error) {
+    console.error("Error parsing query:", error.message);
+    return [];
+  }
+};
