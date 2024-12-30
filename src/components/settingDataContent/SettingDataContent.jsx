@@ -33,10 +33,7 @@ const SettingDataContent = ({
       return false; // Indicate submission failed
     }
 
-    // setErrorMessage(""); // Clear error if valid
-    // alert(
-    //   `Selections are valid! X-axis: ${selectedXAxisCol}, Y-axis: ${selectedYAxisCol}`
-    // );
+ 
     return true; // Indicate submission succeeded
   };
 

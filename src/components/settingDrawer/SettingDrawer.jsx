@@ -34,19 +34,7 @@ const SettingDrawer = ({ selectedXAxisCol,setSelectedXAxisCol,selectedYAxisCol, 
         break;
     }
   };
-  // const handleSubmit = () => {
-  //   if (!selectedXAxisCol || !selectedYAxisCol) {
-  //     setErrorMessage("Please select both X-axis and Y-axis.");
-  //     return;
-  //   }
-
-  //   if (selectedXAxisCol === selectedYAxisCol) {
-  //     setErrorMessage("X-axis and Y-axis cannot be the same.");
-  //     return;
-  //   }
-
-  //   alert(`Selections are valid! X-axis: ${selectedXAxisCol}, Y-axis: ${selectedYAxisCol}`);
-  // };
+ 
 
   return (
     <div className="flex flex-col justify-between h-full">
