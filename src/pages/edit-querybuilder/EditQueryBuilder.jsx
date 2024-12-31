@@ -108,25 +108,41 @@ const EditQueryBuilder = () => {
       return;
     }
 
-    const editData = {
-      globalConfiguration: {},
-      graphList: [
-        ...currentState,
-        {
+    // const editData = {
+    //   globalConfiguration: {},
+    //   graphList: [
+    //     ...currentState,
+    //     {
+    //       graphType: selectedChartType,
+    //       query: queryValue,
+    //       config: {
+    //         colour: "#ff6361",
+    //       },
+    //       graphId: graphId,
+    //       graphName: chartInputValue,
+    //       xAxisLable: xAxis,
+    //       yAxisLabel: yAxis,
+    //       xAxisColumnName: selectedXAxisCol,
+    //       yAxisColumnName: selectedYAxisCol,
+    //     },
+    //   ],
+    // };
+
+    const updatedState = currentState.map((item) => {
+      if (item.graphId === graphId) {
+        return {
+          ...item,
           graphType: selectedChartType,
           query: queryValue,
-          config: {
-            colour: "#ff6361",
-          },
-          graphId: graphId,
           graphName: chartInputValue,
           xAxisLable: xAxis,
           yAxisLabel: yAxis,
           xAxisColumnName: selectedXAxisCol,
           yAxisColumnName: selectedYAxisCol,
-        },
-      ],
-    };
+        };
+      }
+      return item;
+    });
 
     try {
       setQueryLoading(true);
@@ -148,27 +164,14 @@ const EditQueryBuilder = () => {
 
       const putRes = await masdrDevApi.put(
         `/currentstate/updatecurrentstate?paramTenantId=${selectedTenant}`,
-        editData
+        // editData
+        {
+          globalConfiguration: {},
+          graphList: updatedState,
+        }
       );
 
       console.log("putRes", putRes);
-
-      // match graphId in the currentState's array and update that particular object usif setCurrentState(currenstState is the useState's setState function which takes an updated array)
-      const updatedState = currentState.map((item) => {
-        if (item.graphId === graphId) {
-          return {
-            ...item,
-            graphType: selectedChartType,
-            query: queryValue,
-            graphName: chartInputValue,
-            xAxisLable: xAxis,
-            yAxisLabel: yAxis,
-            xAxisColumnName: selectedXAxisCol,
-            yAxisColumnName: selectedYAxisCol,
-          };
-        }
-        return item;
-      });
 
       setCurrentState(updatedState);
 
