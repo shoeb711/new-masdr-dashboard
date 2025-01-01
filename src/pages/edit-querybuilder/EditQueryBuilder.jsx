@@ -149,8 +149,8 @@ const EditQueryBuilder = () => {
 
       const response = await masdrDevApi.post(
         role === userRole.SUPER_ADMIN
-          ? `query-runner/run?paramTenantId=${selectedTenant}`
-          : "query-runner/run",
+          ? `queries/run?paramTenantId=${selectedTenant}`
+          : "queries/run",
         {
           query: queryValue,
           tenant: selectedTenant,
@@ -163,7 +163,7 @@ const EditQueryBuilder = () => {
       );
 
       const putRes = await masdrDevApi.put(
-        `/currentstate/updatecurrentstate?paramTenantId=${selectedTenant}`,
+        `/queries/state?paramTenantId=${selectedTenant}`,
         // editData
         {
           globalConfiguration: {},
