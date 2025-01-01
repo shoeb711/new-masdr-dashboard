@@ -37,12 +37,12 @@ const DashboardCard = (props) => {
           : "queries/run",
         {
           query: query,
-          tenant: selectedTenant,
+          // tenant: selectedTenant,
         }
       );
 
       // console.log("response =>", response.data);
-      const seriesData = response?.data?.result?.map((item) => item.productId);
+      const seriesData = response?.data?.map((item) => item.product_id);
 
       setQueryResponse([
         {
