@@ -8,12 +8,8 @@ import { GlobalContext } from "shared/context/GlobalContext";
 
 const Dashboard = () => {
   const role = localStorage.getItem("role");
-  const {
-    currentState,
-    selectedTenant,
-    setSelectedTenant,
-    isLoading,
-  } = useContext(GlobalContext);
+  const { currentState, selectedTenant, setSelectedTenant, isLoading } =
+    useContext(GlobalContext);
 
   const [tenants, setTenants] = useState([]);
   const [loadingTenants, setLoadingTenants] = useState(false);
@@ -22,20 +18,20 @@ const Dashboard = () => {
     const fetchTenants = async () => {
       try {
         setLoadingTenants(true);
-        const res = await masdrDevApi.get("/tenant/tenantlist", {
+        const res = await masdrDevApi.get("/tenants", {
           headers: {
             "ngrok-skip-browser-warning": true,
           },
         });
         const tenantList = res?.data?.data?.map((tenant) => ({
-          label: tenant.tenantId,
+          label: tenant,
           type: "button",
-          action: () => setSelectedTenant(tenant.tenantId),
+          action: () => setSelectedTenant(tenant),
         }));
 
         setTenants(tenantList);
         console.log("tenantList", tenantList);
-        
+
         if (tenantList.length > 0 && !selectedTenant) {
           setSelectedTenant(tenantList[0].label);
         }
