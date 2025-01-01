@@ -33,16 +33,16 @@ const DashboardCard = (props) => {
 
       const response = await masdrDevApi.post(
         role === userRole.SUPER_ADMIN
-          ? `query-runner/run?paramTenantId=${selectedTenant}`
-          : "query-runner/run",
+          ? `queries/run?paramTenantId=${selectedTenant}`
+          : "queries/run",
         {
           query: query,
-          tenant: selectedTenant,
+          // tenant: selectedTenant,
         }
       );
 
       // console.log("response =>", response.data);
-      const seriesData = response?.data?.result?.map((item) => item.productId);
+      const seriesData = response?.data?.map((item) => item.product_id);
 
       setQueryResponse([
         {

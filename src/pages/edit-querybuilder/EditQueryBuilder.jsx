@@ -54,8 +54,6 @@ const EditQueryBuilder = () => {
     yAxisLabel,
   } = state;
 
-  console.log("state =>", state);
-
   const { currentState, setCurrentState } = useContext(GlobalContext);
 
   const [queryValue, setQueryValue] = useState(!!query ? query : "");
@@ -149,8 +147,8 @@ const EditQueryBuilder = () => {
 
       const response = await masdrDevApi.post(
         role === userRole.SUPER_ADMIN
-          ? `query-runner/run?paramTenantId=${selectedTenant}`
-          : "query-runner/run",
+          ? `queries/run?paramTenantId=${selectedTenant}`
+          : "queries/run",
         {
           query: queryValue,
           tenant: selectedTenant,
@@ -163,7 +161,7 @@ const EditQueryBuilder = () => {
       );
 
       const putRes = await masdrDevApi.put(
-        `/currentstate/updatecurrentstate?paramTenantId=${selectedTenant}`,
+        `/queries/state?paramTenantId=${selectedTenant}`,
         // editData
         {
           globalConfiguration: {},
@@ -175,7 +173,7 @@ const EditQueryBuilder = () => {
 
       setCurrentState(updatedState);
 
-      const seriesData = response?.data?.result?.map((item) => item.productId); // Y-axis values
+      const seriesData = response?.data?.map((item) => item.product_id); // Y-axis values
 
       setQueryResponse([
         {
