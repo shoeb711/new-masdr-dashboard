@@ -54,8 +54,6 @@ const EditQueryBuilder = () => {
     yAxisLabel,
   } = state;
 
-  console.log("state =>", state);
-
   const { currentState, setCurrentState } = useContext(GlobalContext);
 
   const [queryValue, setQueryValue] = useState(!!query ? query : "");
@@ -175,7 +173,7 @@ const EditQueryBuilder = () => {
 
       setCurrentState(updatedState);
 
-      const seriesData = response?.data?.result?.map((item) => item.productId); // Y-axis values
+      const seriesData = response?.data?.map((item) => item.product_id); // Y-axis values
 
       setQueryResponse([
         {

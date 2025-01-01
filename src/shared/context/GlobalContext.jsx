@@ -10,12 +10,12 @@ const GlobalProvider = ({ children }) => {
 
   const { data, isLoading, error } = useFetch(
     masdrDevApi,
-    `/currentstate/getcurrentstate?paramTenantId=${selectedTenant}`
+    `/queries/state?paramTenantId=${selectedTenant}`
   );
 
   useEffect(() => {
-    if (data?.data?.graphList) {
-      setCurrentState(data.data.graphList);
+    if (data?.current_state?.graphList) {
+      setCurrentState(data.current_state.graphList);
     }
   }, [data]);
 
