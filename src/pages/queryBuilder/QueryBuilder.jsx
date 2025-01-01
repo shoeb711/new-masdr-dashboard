@@ -30,12 +30,12 @@ loader.init().then((monaco) => {
 });
 
 const QueryBuilder = () => {
-
   const [graphId, setGraphId] = useState(""); // State for graphId
   // const [queryValue, setQueryValue] = useState("");
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState(false);
   const [queryResponse, setQueryResponse] = useState([]);
+  console.log(queryResponse, "queryResponse");
   const [queryBuilderTab, setQueryBuilderTab] = useState("");
   const [tenants, setTenants] = useState([]); // State to store tenant list
   const [selectedTenant, setSelectedTenant] = useState(""); // Updated to match dynamic tenants
@@ -48,7 +48,7 @@ const QueryBuilder = () => {
   const [selectedYAxisCol, setSelectedYAxisCol] = useState("");
 
   const [queryValue, setQueryValue] = useState("");
-  const [columnNames, setColumnNames] = useState([]); 
+  const [columnNames, setColumnNames] = useState([]);
 
   // State to store extracted column names
 
@@ -69,11 +69,10 @@ const QueryBuilder = () => {
     setQueryValue("");
     setColumnNames([]);
     setChartTitle(""); // Reset chart title
-    setSelectedXAxisCol("")
+    setSelectedXAxisCol("");
     setSelectedYAxisCol("");
   };
   // console.log(graphId)
-
 
   const parseColumns = (query) => {
     try {
@@ -125,21 +124,21 @@ const QueryBuilder = () => {
 
   const fetchChartData = async () => {
     if (!queryValue) return;
-  
+
     if (queryValue.includes("*")) {
       alert(
         "Queries containing '*' are not allowed. Please specify the columns explicitly."
       );
       return;
     }
-  
+
     try {
       setQueryLoading(true);
-  
+
       // If there's no graphId, generate a new one and run the POST API to create the data
       const newGraphId = graphId || Date.now(); // Use existing graphId if it's already set
       let response;
-  
+
       // If graphId exists, update the data with PUT API, otherwise create it with POST API
       if (graphId) {
         // Update data via PUT API if graphId is already present
@@ -156,16 +155,17 @@ const QueryBuilder = () => {
           xAxisColumnName: selectedXAxisCol || "X-Column", // First column for X-Axis
           yAxisColumnName: selectedYAxisCol || "Y-Column", // Second column for Y-Axis
         };
-  
+
         const putEndpoint =
           role === userRole.SUPER_ADMIN
             ? `/currentstate/updatecurrentstate?paramTenantId=${selectedTenant}`
             : "/currentstate/updatecurrentstate";
-  
+
         // Run the PUT API to update data
         response = await masdrDevApi.put(putEndpoint, chartData);
         console.log("Data updated successfully:", response.data);
       } else {
+        
         // Otherwise, if graphId is not present, create a new entry via POST API
         response = await masdrDevApi.post(
           role === userRole.SUPER_ADMIN
@@ -177,9 +177,9 @@ const QueryBuilder = () => {
             graphId: newGraphId, // Pass new graphId in the payload
           }
         );
-  
+
         console.log("response =>", response.data);
-  
+
         // Save the graphId in state after first POST response
         setGraphId(newGraphId);
 
@@ -200,15 +200,16 @@ const QueryBuilder = () => {
           role === userRole.SUPER_ADMIN
             ? `/currentstate/updatecurrentstate?paramTenantId=${selectedTenant}`
             : "/currentstate/updatecurrentstate";
-  
+
         // Run the PUT API to update data
-        response = await masdrDevApi.put(putEndpoint, chartData);
-        console.log("Data updated successfully:", response.data);
+        const putResponse = await masdrDevApi.put(putEndpoint, chartData);
+        console.log("Data updated successfully:", putResponse);
         console.log("Graph ID set:", newGraphId);
       }
-  
+
       const seriesData = response?.data?.result?.map((item) => item.productId);
-  
+      console.log(seriesData, "seriesData");
+
       setQueryResponse([
         {
           name: response?.data?.tenant,
@@ -222,7 +223,6 @@ const QueryBuilder = () => {
       setQueryLoading(false);
     }
   };
-  
 
   const handleRunQuery = () => {
     // const newGraphId = `graph-${Date.now()}`; // Generate a new unique graphId using Date.now()
@@ -269,7 +269,7 @@ const QueryBuilder = () => {
           <p className="capitalize">
             {!!queryResponse?.length ? queryResponse[0]?.name : ""}
           </p>
-        
+
           <Chart
             options={{
               ...queryResponseChartOptions,
@@ -316,19 +316,19 @@ const QueryBuilder = () => {
       <div className="flex justify-between items-center p-4">
         <h1 className="text-lg font-bold">QUERY BUILDER</h1>
         <div className="flex items-center gap-4">
-         <button
+          <button
             onClick={resetState}
-              className="btn-primary w-48 rounded-md h-9 p-0"
+            className="btn-primary w-48 rounded-md h-9 p-0"
             // className="btn-secondary bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
           >
-            Add New Graph 
+            Add New Graph
           </button>
-        {role === userRole.SUPER_ADMIN && (
-          <Dropdown
-            buttonText={selectedTenant || "Select Tenant"}
-            items={tenants}
-          />
-        )}
+          {role === userRole.SUPER_ADMIN && (
+            <Dropdown
+              buttonText={selectedTenant || "Select Tenant"}
+              items={tenants}
+            />
+          )}
         </div>
       </div>
 
@@ -337,9 +337,11 @@ const QueryBuilder = () => {
           <div className="bg-gray-100">
             <div className="flex justify-between items-center border-b border-gray-300 px-3 py-2">
               <div className="w-96">
-                <InputField placeholder="Enter Chart Title" 
+                <InputField
+                  placeholder="Enter Chart Title"
                   value={chartTitle} // Bind to chartTitle state
-                  onChange={(e) => setChartTitle(e.target.value)} /> 
+                  onChange={(e) => setChartTitle(e.target.value)}
+                />
               </div>
             </div>
             <section className="flex items-start">
@@ -351,7 +353,7 @@ const QueryBuilder = () => {
                   height="45vh"
                   width="100%"
                   theme="myTheme"
-                  className="bg-gray-100" 
+                  className="bg-gray-100"
                   defaultLanguage="sql"
                   onMount={onMount}
                   value={queryValue}
@@ -422,10 +424,10 @@ const QueryBuilder = () => {
         onClose={() => setQueryBuilderTab("")}
       >
         <SettingDrawer
-        selectedXAxisCol={selectedXAxisCol}
-        setSelectedXAxisCol={setSelectedXAxisCol}
-        selectedYAxisCol={selectedYAxisCol}
-        setSelectedYAxisCol={setSelectedYAxisCol}
+          selectedXAxisCol={selectedXAxisCol}
+          setSelectedXAxisCol={setSelectedXAxisCol}
+          selectedYAxisCol={selectedYAxisCol}
+          setSelectedYAxisCol={setSelectedYAxisCol}
           onClose={() => setQueryBuilderTab("")}
           columnNames={columnNames}
           xAxis={xAxis}
