@@ -3,7 +3,7 @@ import { queryBuilderTabEnum } from "shared/constant";
 
 const QueryBuilderTab = ({ setQueryBuilderTab, queryBuilderTab }) => {
   return (
-    <div className="border-t pt-10 pb-3">
+    <div className="pt-10 pb-3">
       <span className="isolate inline-flex rounded-md shadow-sm gap-1">
         <button
           type="button"

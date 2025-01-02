@@ -33,7 +33,7 @@ const DashboardCard = (props) => {
 
       const response = await masdrDevApi.post(
         role === userRole.SUPER_ADMIN
-          ? `queries/run?paramTenantId=${selectedTenant}`
+          ? `queries/run?paramTenantId=${selectedTenant.id}`
           : "queries/run",
         {
           query: query,
