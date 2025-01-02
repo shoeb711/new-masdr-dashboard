@@ -72,7 +72,9 @@ const DashboardCard = (props) => {
       return (
         <div className="w-full" key={graphId}>
           <Chart
-            series={graphType === "pie" ? queryResponse[0]?.data : queryResponse}
+            series={
+              graphType === "pie" ? queryResponse[0]?.data : queryResponse
+            }
             options={options}
             type={graphType}
             height={300}
@@ -91,11 +93,15 @@ const DashboardCard = (props) => {
           <button
             type="button"
             className="w-20 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-            onClick={() =>
+            onClick={() => {
               navigate(`${PATH.editqueryBuilder}/${graphId}`, {
                 state: {
                   singleChartData: queryResponse,
-                  selectedTenant: selectedTenant,
+                  // selectedTenant: selectedTenant,
+                  selectedTenant: {
+                    id: selectedTenant?.id,
+                    label: selectedTenant?.label,
+                  },
                   query: query,
                   graphName: graphName,
                   graphId: graphId,
@@ -105,8 +111,8 @@ const DashboardCard = (props) => {
                   xAxisLable: xAxisLable,
                   yAxisLabel: yAxisLabel,
                 },
-              })
-            }
+              });
+            }}
           >
             Edit
           </button>
