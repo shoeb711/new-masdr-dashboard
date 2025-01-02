@@ -31,19 +31,17 @@ loader.init().then((monaco) => {
 });
 
 const QueryBuilder = () => {
-  const [graphId, setGraphId] = useState(""); // State for graphId
-  // const [queryValue, setQueryValue] = useState("");
+  const [storedGraphId, setStoredGraphId] = useState("");
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryError, setQueryError] = useState(false);
   const [queryResponse, setQueryResponse] = useState([]);
-  // console.log(queryResponse, "queryResponse");
   const [queryBuilderTab, setQueryBuilderTab] = useState("");
-  const [tenants, setTenants] = useState([]); // State to store tenant list
-  const [selectedTenant, setSelectedTenant] = useState(""); // Updated to match dynamic tenants
+  const [tenants, setTenants] = useState([]);
+  const [selectedTenant, setSelectedTenant] = useState("");
   const [selectedChartType, setSelectedChartType] = useState("bar");
 
-  const [xAxis, setXAxis] = useState(""); // X-Axis Label
-  const [yAxis, setYAxis] = useState(""); // Y-Axis Label
+  const [xAxis, setXAxis] = useState("");
+  const [yAxis, setYAxis] = useState("");
 
   const [selectedXAxisCol, setSelectedXAxisCol] = useState("");
   const [selectedYAxisCol, setSelectedYAxisCol] = useState("");
@@ -53,12 +51,10 @@ const QueryBuilder = () => {
 
   const { currentState, setCurrentState } = useContext(GlobalContext);
 
-  // State to store extracted column names
-
-  const [chartTitle, setChartTitle] = useState(""); // New state for chart title
+  const [chartTitle, setChartTitle] = useState("");
 
   const resetState = () => {
-    setGraphId(null); // Reset graphId
+    setStoredGraphId("");
     setQueryLoading(false);
     setQueryError(false);
     setQueryResponse([]);
@@ -69,7 +65,7 @@ const QueryBuilder = () => {
     setYAxis("");
     setQueryValue("");
     setColumnNames([]);
-    setChartTitle(""); // Reset chart title
+    setChartTitle("");
     setSelectedXAxisCol("");
     setSelectedYAxisCol("");
   };
@@ -94,108 +90,6 @@ const QueryBuilder = () => {
     });
   };
 
-  // const fetchChartData = async () => {
-  //   if (!queryValue) return;
-
-  //   if (queryValue.includes("*")) {
-  //     alert(
-  //       "Queries containing '*' are not allowed. Please specify the columns explicitly."
-  //     );
-  //     return;
-  //   }
-
-  //   try {
-  //     setQueryLoading(true);
-
-  //     // If there's no graphId, generate a new one and run the POST API to create the data
-  //     const newGraphId = graphId || Date.now(); // Use existing graphId if it's already set
-  //     // let response;
-  //     setGraphId(newGraphId);
-  //     // If graphId exists, update the data with PUT API, otherwise create it with POST API
-  //     if (graphId) {
-  //       // Update data via PUT API if graphId is already present
-  //       const chartData = {
-  //         graphType: selectedChartType,
-  //         query: queryValue, // The SQL query
-  //         config: {
-  //           colour: "#ff6361", // Static color, adjust as needed
-  //         },
-  //         graphId: graphId, // Use the existing graphId
-  //         graphName: chartTitle || "Untitled Chart", // Use chartTitle or default
-  //         xAxisLabel: xAxis || "X-Axis", // X-Axis label
-  //         yAxisLabel: yAxis || "Y-Axis", // Y-Axis label
-  //         xAxisColumnName: selectedXAxisCol || "X-Column", // First column for X-Axis
-  //         yAxisColumnName: selectedYAxisCol || "Y-Column", // Second column for Y-Axis
-  //       };
-
-  //       const putEndpoint =
-  //         role === userRole.SUPER_ADMIN
-  //           ? `queries/state?paramTenantId=${selectedTenant}`
-  //           : "queries/state";
-
-  //       // Run the PUT API to update data
-  //       response = await masdrDevApi.put(putEndpoint, chartData);
-  //       console.log("Data updated successfully:", response.data);
-  //     } else {
-
-  //       // Otherwise, if graphId is not present, create a new entry via POST API
-  //       response = await masdrDevApi.post(
-  //         role === userRole.SUPER_ADMIN
-  //           ? `query-runner/run?paramTenantId=${selectedTenant}`
-  //           : "query-runner/run",
-  //         {
-  //           query: queryValue,
-  //           tenant: selectedTenant,
-  //           graphId: newGraphId, // Pass new graphId in the payload
-  //         }
-  //       );
-
-  //       console.log("response =>", response.data);
-
-  //       // Save the graphId in state after first POST response
-  //       setGraphId(newGraphId);
-
-  //       const chartData = {
-  //         graphType: selectedChartType,
-  //         query: queryValue, // The SQL query
-  //         config: {
-  //           colour: "#ff6361", // Static color, adjust as needed
-  //         },
-  //         graphId: graphId, // Use the existing graphId
-  //         graphName: chartTitle || "Untitled Chart", // Use chartTitle or default
-  //         xAxisLabel: xAxis || "X-Axis", // X-Axis label
-  //         yAxisLabel: yAxis || "Y-Axis", // Y-Axis label
-  //         xAxisColumnName: selectedXAxisCol || "X-Column", // First column for X-Axis
-  //         yAxisColumnName: selectedYAxisCol || "Y-Column", // Second column for Y-Axis
-  //       };
-  //       const putEndpoint =
-  //         role === userRole.SUPER_ADMIN
-  //           ? `queries/state?paramTenantId=${selectedTenant}`
-  //           : "queries/state";
-
-  //       // Run the PUT API to update data
-  //       const putResponse = await masdrDevApi.put(putEndpoint, chartData);
-  //       console.log("Data updated successfully:", putResponse);
-  //       console.log("Graph ID set:", newGraphId);
-  //     }
-
-  //     const seriesData = response?.data?.result?.map((item) => item.productId);
-  //     console.log(seriesData, "seriesData");
-
-  //     setQueryResponse([
-  //       {
-  //         name: response?.data?.tenant,
-  //         data: seriesData,
-  //       },
-  //     ]);
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     setQueryError(true);
-  //   } finally {
-  //     setQueryLoading(false);
-  //   }
-  // };
-
   const fetchChartData = async () => {
     if (!queryValue) return;
 
@@ -206,60 +100,84 @@ const QueryBuilder = () => {
       return;
     }
 
+    const randomGraphId = Date.now();
+
+    const postData = {
+      query: queryValue,
+      tenant: selectedTenant,
+    };
+
+    const updatedStateDataWithId = currentState?.map((item) => {
+      if (item.graphId === storedGraphId) {
+        return {
+          ...item,
+          graphType: selectedChartType,
+          query: queryValue,
+          graphName: chartTitle,
+          xAxisLable: xAxis,
+          yAxisLabel: yAxis,
+          xAxisColumnName: selectedXAxisCol,
+          yAxisColumnName: selectedYAxisCol,
+        };
+      }
+      return item;
+    });
+
+    const updatedStateDataWithoutId = {
+      globalConfiguration: {},
+      graphList: [
+        ...currentState,
+        {
+          graphId: randomGraphId,
+          graphType: selectedChartType,
+          query: queryValue,
+          graphName: chartTitle,
+          xAxisLable: xAxis,
+          yAxisLabel: yAxis,
+          xAxisColumnName: selectedXAxisCol,
+          yAxisColumnName: selectedYAxisCol,
+        },
+      ],
+    };
+
+    const isStoredIdPresentInGlobal = currentState?.some(
+      (item) => item.graphId === storedGraphId
+    );
+
+    const transformedData = {
+      globalConfiguration: {},
+      graphList: updatedStateDataWithId,
+    };
+
+    const putData = isStoredIdPresentInGlobal
+      ? transformedData
+      : updatedStateDataWithoutId;
+
     try {
       setQueryLoading(true);
 
-      // Generate a new graphId if it doesn't exist
-      const newGraphId = Date.now();
-      // setGraphId(newGraphId);
+      const res = await masdrDevApi.post("/queries/run", postData);
+      console.log("Data fetched POST API:", res.data);
 
-      const chartData = {
-        graphType: selectedChartType,
-        query: queryValue,
-        config: {
-          colour: "#ff6361",
-        },
-        graphId: newGraphId,
-        graphName: chartTitle || "Untitled Chart",
-        xAxisLabel: xAxis || "X-Axis",
-        yAxisLabel: yAxis || "Y-Axis",
-        xAxisColumnName: selectedXAxisCol || "X-Column",
-        yAxisColumnName: selectedYAxisCol || "Y-Column",
-      };
+      if (!!res?.data?.length) {
+        const seriesData = res?.data?.map((item) => item.product_id);
+        const seriesDataName = res?.data?.map((item) => item.name);
 
-      // POST API endpoint
-      const postEndpoint =
-        role === userRole.SUPER_ADMIN
-          ? `queries/run?paramTenantId=${selectedTenant}`
-          : "queries/run";
+        setStoredGraphId(randomGraphId);
 
-      // Run the POST API
-      const postResponse = await masdrDevApi.post(postEndpoint, {
-        query: queryValue,
-        // tenant: selectedTenant,
-        // graphId: newGraphId,
-      });
+        setQueryResponse([
+          {
+            name: seriesDataName,
+            data: seriesData,
+          },
+        ]);
 
-      // PUT API endpoint
-      const putEndpoint =
-        role === userRole.SUPER_ADMIN
-          ? `queries/state?paramTenantId=${selectedTenant}`
-          : "queries/state";
-
-      // Run the PUT API
-      const putResponse = await masdrDevApi.put(putEndpoint, chartData);
-      console.log("Data updated successfully via PUT API:", putResponse.data);
-
-      console.log("Data fetched successfully via POST API:", postResponse.data);
-
-      // Update the chart data after successful responses
-      const seriesData = postResponse?.data?.map((item) => item.product_id);
-      setQueryResponse([
-        {
-          name: postResponse?.data?.tenant,
-          data: seriesData,
-        },
-      ]);
+        const putRes = await masdrDevApi.put("/queries/state", putData);
+        setCurrentState(putRes?.data?.current_state?.graphList);
+        console.log("Data PUT API:", putRes.data);
+      } else {
+        setQueryResponse([]);
+      }
     } catch (error) {
       console.error("Error:", error);
       setQueryError(true);
@@ -304,10 +222,6 @@ const QueryBuilder = () => {
     } else {
       return !!queryResponse?.length ? (
         <div className="pt-10">
-          <p className="capitalize">
-            {!!queryResponse?.length ? queryResponse[0]?.name : ""}
-          </p>
-
           <Chart
             options={{
               ...queryResponseChartOptions,
