@@ -1,12 +1,27 @@
 /* eslint-disable no-undef */
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "tailwindcss";
 import path from "path";
+import federation from "@originjs/vite-plugin-federation";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(),tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    federation({
+      name: "dashboard",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./Dashboard": "./src/shared/components/displayChart/DisplayChart.jsx",
+      },
+      shared: ["react", "react-dom", "react-apexcharts"], // Shared dependencies
+    }),
+  ],
+  build: {
+    target: "ES2022",
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src/"),
@@ -17,4 +32,4 @@ export default defineConfig({
       components: path.resolve(__dirname, "./src/components"),
     },
   },
-})
+});

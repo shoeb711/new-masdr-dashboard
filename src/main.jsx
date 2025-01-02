@@ -7,10 +7,10 @@ import GlobalProvider from "shared/context/GlobalContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <GlobalProvider>
+    {/* <BrowserRouter> */}
+      {/* <GlobalProvider> */}
         <App />
-      </GlobalProvider>
-    </BrowserRouter>
+      {/* </GlobalProvider> */}
+    {/* </BrowserRouter> */}
   </StrictMode>
 );
