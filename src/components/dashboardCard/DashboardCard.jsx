@@ -3,8 +3,10 @@ import Chart from "react-apexcharts";
 import { PATH, userRole } from "shared/constant";
 import { options } from "shared/helper";
 import { masdrDevApi } from "shared/axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import PrimaryLoader from "shared/components/primaryLoader/PrimaryLoader";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const DashboardCard = (props) => {
   const {
@@ -24,6 +26,7 @@ const DashboardCard = (props) => {
   const [queryResponse, setQueryResponse] = useState([]);
 
   const navigate = useNavigate();
+  const chartRef = useRef(null);
 
   const role = localStorage.getItem("role");
 
@@ -37,11 +40,9 @@ const DashboardCard = (props) => {
           : "queries/run",
         {
           query: query,
-          // tenant: selectedTenant,
         }
       );
 
-      // console.log("response =>", response.data);
       const seriesData = response?.data?.map((item) => item.product_id);
 
       setQueryResponse([
@@ -70,7 +71,7 @@ const DashboardCard = (props) => {
       return <p>Something went wrong.</p>;
     } else {
       return (
-        <div className="w-full" key={graphId}>
+        <div className="w-full" key={graphId} ref={chartRef}>
           <Chart
             series={
               graphType === "pie" ? queryResponse[0]?.data : queryResponse
@@ -84,44 +85,62 @@ const DashboardCard = (props) => {
     }
   };
 
+  const downloadPDF = async () => {
+    const chartElement = chartRef.current;
+
+    if (chartElement) {
+      const canvas = await html2canvas(chartElement);
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("landscape");
+      pdf.addImage(imgData, "PNG", 10, 10, 280, 150); // Adjust dimensions as needed
+      pdf.save(`${graphName}.pdf`);
+    }
+  };
+
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">
-      {/* <div className="px-4 py-5 sm:p-6 grid md:grid-cols-2 gap-8"> */}
       <div className="flex flex-col gap-3 border border-gray-200 rounded-lg p-2">
         <div className="flex items-center justify-between w-full">
           <h3 className="text-base font-semibold text-gray-900">{graphName}</h3>
-          <button
-            type="button"
-            className="w-20 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-            onClick={() => {
-              navigate(`${PATH.editqueryBuilder}/${graphId}`, {
-                state: {
-                  singleChartData: queryResponse,
-                  // selectedTenant: selectedTenant,
-                  selectedTenant: {
-                    id: selectedTenant?.id,
-                    label: selectedTenant?.label,
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="w-16 rounded-md bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              onClick={downloadPDF}
+            > PDF</button>
+            <button
+              type="button"
+              className="w-16 rounded-md bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              onClick={() =>
+                navigate(`${PATH.editqueryBuilder}/${graphId}`, {
+                  state: {
+                    singleChartData: queryResponse,
+                    // selectedTenant: selectedTenant,
+                    selectedTenant: {
+                      id: selectedTenant?.id,
+                      label: selectedTenant?.label,
+                    },
+                    query: query,
+                    graphName: graphName,
+                    graphId: graphId,
+                    graphType: graphType,
+                    xAxisColumnName: xAxisColumnName,
+                    yAxisColumnName: yAxisColumnName,
+                    xAxisLable: xAxisLable,
+                    yAxisLabel: yAxisLabel,
                   },
-                  query: query,
-                  graphName: graphName,
-                  graphId: graphId,
-                  graphType: graphType,
-                  xAxisColumnName: xAxisColumnName,
-                  yAxisColumnName: yAxisColumnName,
-                  xAxisLable: xAxisLable,
-                  yAxisLabel: yAxisLabel,
-                },
-              });
-            }}
-          >
-            Edit
-          </button>
+                })
+              }
+            >
+              Edit
+            </button>
+          </div>
         </div>
-
         {renderChartData()}
       </div>
-      {/* </div> */}
     </div>
   );
 };
+
 export default DashboardCard;
