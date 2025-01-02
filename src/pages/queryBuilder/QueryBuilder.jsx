@@ -100,11 +100,11 @@ const QueryBuilder = () => {
       return;
     }
 
-    const randomGraphId = Date.now();
+    const randomGraphId = Math.floor(Math.random() * 100000);
 
     const postData = {
       query: queryValue,
-      tenant: selectedTenant,
+      // tenant: selectedTenant,
     };
 
     const updatedStateDataWithId = currentState?.map((item) => {
@@ -157,13 +157,15 @@ const QueryBuilder = () => {
       setQueryLoading(true);
 
       const res = await masdrDevApi.post("/queries/run", postData);
-      console.log("Data fetched POST API:", res.data);
+      // console.log("Data fetched POST API:", res.data);
 
       if (!!res?.data?.length) {
         const seriesData = res?.data?.map((item) => item.product_id);
         const seriesDataName = res?.data?.map((item) => item.name);
 
-        setStoredGraphId(randomGraphId);
+        if (!isStoredIdPresentInGlobal) {
+          setStoredGraphId(randomGraphId);
+        }
 
         setQueryResponse([
           {
@@ -174,7 +176,7 @@ const QueryBuilder = () => {
 
         const putRes = await masdrDevApi.put("/queries/state", putData);
         setCurrentState(putRes?.data?.current_state?.graphList);
-        console.log("Data PUT API:", putRes.data);
+        // console.log("Data PUT API:", putRes.data);
       } else {
         setQueryResponse([]);
       }

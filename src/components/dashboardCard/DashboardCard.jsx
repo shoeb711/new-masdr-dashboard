@@ -73,7 +73,9 @@ const DashboardCard = (props) => {
       return (
         <div className="w-full" key={graphId} ref={chartRef}>
           <Chart
-            series={graphType === "pie" ? queryResponse[0]?.data : queryResponse}
+            series={
+              graphType === "pie" ? queryResponse[0]?.data : queryResponse
+            }
             options={options}
             type={graphType}
             height={300}
@@ -114,7 +116,11 @@ const DashboardCard = (props) => {
                 navigate(`${PATH.editqueryBuilder}/${graphId}`, {
                   state: {
                     singleChartData: queryResponse,
-                    selectedTenant: selectedTenant,
+                    // selectedTenant: selectedTenant,
+                    selectedTenant: {
+                      id: selectedTenant?.id,
+                      label: selectedTenant?.label,
+                    },
                     query: query,
                     graphName: graphName,
                     graphId: graphId,
