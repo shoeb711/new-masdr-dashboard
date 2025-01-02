@@ -1,3 +1,113 @@
+// import { useState } from "react";
+
+// // Reusable InputField Component
+// const InputField = ({
+//   id,
+//   name,
+//   type = "text",
+//   placeholder,
+//   value,
+//   onChange,
+//   ariaLabel,
+//   className = "",
+//   ...props
+// }) => {
+//   return (
+//     <input
+//       id={id}
+//       name={name}
+//       type={type}
+//       placeholder={placeholder}
+//       aria-label={ariaLabel || name}
+//       value={value}
+//       onChange={onChange}
+//       className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${className}`}
+//       {...props}
+//     />
+//   );
+// };
+
+// const SettingDisplayContent = ({
+//   xAxis,
+//   setXAxis,
+//   yAxis,
+//   setYAxis,
+//   onClose,
+// }) => {
+//   const [errorMessage, setErrorMessage] = useState("");
+
+//   const handleSubmit = () => {
+//     if (!xAxis || !xAxis) {
+//       setErrorMessage("Please fill in both X-axis and Y-axis.");
+//       return false; // Return false to indicate invalid input
+//     }
+//     setErrorMessage(""); // Clear error if valid
+
+//     return true; // Return true to indicate valid input
+//   };
+
+//   return (
+//     <div className="flex flex-col gap-4">
+//       {/* Input Fields for X-Axis and Y-Axis */}
+//       <div className="flex flex-col gap-4">
+//         <div>
+//           <label
+//             htmlFor="x-axis"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             X-Axis
+//           </label>
+//           <InputField
+//             id="x-axis"
+//             name="xAxis"
+//             placeholder="Enter X-Axis value"
+//             value={xAxis}
+//             onChange={(e) => setXAxis(e.target.value)}
+//           />
+//         </div>
+
+//         <div>
+//           <label
+//             htmlFor="y-axis"
+//             className="block text-sm font-medium text-gray-700"
+//           >
+//             Y-Axis
+//           </label>
+//           <InputField
+//             id="y-axis"
+//             name="yAxis"
+//             placeholder="Enter Y-Axis value"
+//             value={yAxis}
+//             onChange={(e) => setYAxis(e.target.value)}
+//           />
+//         </div>
+//       </div>
+
+//       {/* Error Message */}
+//       {errorMessage && (
+//         <div className="text-red-600 text-sm font-medium mt-2">
+//           {errorMessage}
+//         </div>
+//       )}
+
+//       {/* Submit Button */}
+//       <button
+//         className="btn-primary w-48"
+//         onClick={() => {
+//           const isValid = handleSubmit();
+//           if (isValid) {
+//             onClose(); // Call onClose only if input is valid
+//           }
+//         }}
+//       >
+//         Done
+//       </button>
+//     </div>
+//   );
+// };
+
+// export default SettingDisplayContent;
+
 import { useState } from "react";
 
 // Reusable InputField Component
@@ -21,6 +131,7 @@ const InputField = ({
       aria-label={ariaLabel || name}
       value={value}
       onChange={onChange}
+      maxLength={10} // Prevent user from typing more than 10 characters
       className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${className}`}
       {...props}
     />
@@ -36,14 +147,23 @@ const SettingDisplayContent = ({
 }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = () => {
-    if (!xAxis || !xAxis) {
-      setErrorMessage("Please fill in both X-axis and Y-axis.");
-      return false; // Return false to indicate invalid input
+  const handleInputChange = (setter, value) => {
+    if (value.length > 10) {
+      setErrorMessage("Input values cannot exceed 10 characters."); // Display error message
+    } else {
+      setErrorMessage(""); // Clear error if input is valid
     }
-    setErrorMessage(""); // Clear error if valid
+    setter(value); // Update the state with the input value
+  };
 
-    return true; // Return true to indicate valid input
+  const handleSubmit = () => {
+    if (!xAxis || !yAxis) {
+      setErrorMessage("Both X-axis and Y-axis values are required.");
+      return false;
+    }
+
+    setErrorMessage(""); // Clear error if valid
+    return true;
   };
 
   return (
@@ -60,9 +180,9 @@ const SettingDisplayContent = ({
           <InputField
             id="x-axis"
             name="xAxis"
-            placeholder="Enter X-Axis value"
+            placeholder="Enter up to 10 characters for X-Axis"
             value={xAxis}
-            onChange={(e) => setXAxis(e.target.value)}
+            onChange={(e) => handleInputChange(setXAxis, e.target.value)}
           />
         </div>
 
@@ -76,19 +196,12 @@ const SettingDisplayContent = ({
           <InputField
             id="y-axis"
             name="yAxis"
-            placeholder="Enter Y-Axis value"
+            placeholder="Enter up to 10 characters for Y-Axis"
             value={yAxis}
-            onChange={(e) => setYAxis(e.target.value)}
+            onChange={(e) => handleInputChange(setYAxis, e.target.value)}
           />
         </div>
       </div>
-
-      {/* Error Message */}
-      {errorMessage && (
-        <div className="text-red-600 text-sm font-medium mt-2">
-          {errorMessage}
-        </div>
-      )}
 
       {/* Submit Button */}
       <button
@@ -102,6 +215,13 @@ const SettingDisplayContent = ({
       >
         Done
       </button>
+
+      {/* Error Message Below the Button */}
+      {errorMessage && (
+        <div className="text-red-600 text-sm font-medium mt-2">
+          {errorMessage}
+        </div>
+      )}
     </div>
   );
 };
