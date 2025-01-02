@@ -147,11 +147,11 @@ const EditQueryBuilder = () => {
 
       const response = await masdrDevApi.post(
         role === userRole.SUPER_ADMIN
-          ? `queries/run?paramTenantId=${selectedTenant}`
+          ? `queries/run?paramTenantId=${selectedTenant.id}`
           : "queries/run",
         {
           query: queryValue,
-          tenant: selectedTenant,
+          //tenant: selectedTenant,
         },
         {
           headers: {
@@ -161,7 +161,7 @@ const EditQueryBuilder = () => {
       );
 
       const putRes = await masdrDevApi.put(
-        `/queries/state?paramTenantId=${selectedTenant}`,
+        `/queries/state?paramTenantId=${selectedTenant.id}`,
         // editData
         {
           globalConfiguration: {},
@@ -280,7 +280,7 @@ const EditQueryBuilder = () => {
             >
               Add new query
             </button>
-            <Dropdown buttonText={selectedTenant} />
+            <Dropdown buttonText={selectedTenant.label} />
           </div>
         )}
       </div>

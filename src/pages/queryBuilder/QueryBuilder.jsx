@@ -15,6 +15,7 @@ import { GlobalContext } from "shared/context/GlobalContext";
 import {
   editorEvents,
   parseColumns,
+  queryResponseChartLineOptions,
   // queryResponseChartLineOptions,
   queryResponseChartOptions,
 } from "shared/helper";
@@ -85,7 +86,6 @@ const QueryBuilder = () => {
       const query = editor.getValue();
       const columns = parseColumns(query);
 
-      console.log("Extracted Columns:", columns);
       setColumnNames(columns);
     });
   };
@@ -167,7 +167,7 @@ const QueryBuilder = () => {
 
         setQueryResponse([
           {
-            name: seriesDataName,
+            xAxisName: seriesDataName,
             data: seriesData,
           },
         ]);
@@ -195,16 +195,16 @@ const QueryBuilder = () => {
           },
         });
 
-        // Map tenant data from the API response
         const tenantList = res?.data?.data?.map((tenant) => ({
-          label: tenant, // Use tenantId as the label
-          type: "button", // Define button type
-          action: () => setSelectedTenant(tenant), // Update selected tenant
+          label: tenant.label,
+          id: tenant.id,
+          type: "button",
+          action: () => setSelectedTenant(tenant),
         }));
 
-        setTenants(tenantList); // Update tenants with dynamic data
+        setTenants(tenantList);
         if (tenantList.length > 0) {
-          setSelectedTenant(tenantList[0].label); // Default to the first tenant
+          setSelectedTenant(tenantList[0]);
         }
       } catch (error) {
         console.error("Error fetching tenant list:", error);
@@ -223,32 +223,64 @@ const QueryBuilder = () => {
       return !!queryResponse?.length ? (
         <div className="pt-10">
           <Chart
-            options={{
-              ...queryResponseChartOptions,
-              chart: {
-                type: selectedChartType,
-              },
-              xaxis: {
-                title: {
-                  text: xAxis || "X-Axis", // Use xAxis value or default
-                  style: {
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    color: "#333",
-                  },
-                },
-              },
-              yaxis: {
-                title: {
-                  text: yAxis || "Y-Axis", // Use yAxis value or default
-                  style: {
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    color: "#333",
-                  },
-                },
-              },
-            }}
+            options={
+              selectedChartType === "line"
+                ? {
+                    ...queryResponseChartLineOptions,
+                    xaxis: {
+                      title: {
+                        text: xAxis || "",
+                        style: {
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          color: "#333",
+                        },
+                      },
+                      categories: queryResponse?.length
+                        ? queryResponse[0].xAxisName
+                        : [],
+                    },
+                    yaxis: {
+                      title: {
+                        text: yAxis || "",
+                        style: {
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          color: "#333",
+                        },
+                      },
+                    },
+                  }
+                : {
+                    ...queryResponseChartOptions,
+                    chart: {
+                      type: selectedChartType,
+                    },
+                    xaxis: {
+                      title: {
+                        text: xAxis || "X-Axis", // Use xAxis value or default
+                        style: {
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          color: "#333",
+                        },
+                      },
+                      categories: queryResponse?.length
+                        ? queryResponse[0].xAxisName
+                        : [],
+                    },
+                    yaxis: {
+                      title: {
+                        text: yAxis || "Y-Axis", // Use yAxis value or default
+                        style: {
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          color: "#333",
+                        },
+                      },
+                    },
+                  }
+            }
             key={selectedChartType}
             series={
               selectedChartType === "pie"
@@ -271,13 +303,12 @@ const QueryBuilder = () => {
           <button
             onClick={resetState}
             className="btn-primary w-48 rounded-md h-9 p-0"
-            // className="btn-secondary bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
           >
             Add New Graph
           </button>
           {role === userRole.SUPER_ADMIN && (
             <Dropdown
-              buttonText={selectedTenant || "Select Tenant"}
+              buttonText={selectedTenant.label || "Select Tenant"}
               items={tenants}
             />
           )}

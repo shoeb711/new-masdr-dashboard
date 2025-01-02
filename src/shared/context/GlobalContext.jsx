@@ -6,11 +6,12 @@ export const GlobalContext = createContext();
 
 const GlobalProvider = ({ children }) => {
   const [selectedTenant, setSelectedTenant] = useState("");
+
   const [currentState, setCurrentState] = useState([]);
 
   const { data, isLoading, error } = useFetch(
     masdrDevApi,
-    `/queries/state?paramTenantId=${selectedTenant}`
+    `/queries/state?paramTenantId=${selectedTenant.id}`
   );
 
   useEffect(() => {

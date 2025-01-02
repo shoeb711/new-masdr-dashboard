@@ -24,7 +24,8 @@ const Dashboard = () => {
           },
         });
         const tenantList = res?.data?.data?.map((tenant) => ({
-          label: tenant,
+          label: tenant.label,
+          id: tenant.id,
           type: "button",
           action: () => setSelectedTenant(tenant),
         }));
@@ -33,7 +34,7 @@ const Dashboard = () => {
         console.log("tenantList", tenantList);
 
         if (tenantList.length > 0 && !selectedTenant) {
-          setSelectedTenant(tenantList[0].label);
+          setSelectedTenant(tenantList[0]);
         }
       } catch (error) {
         console.error("Error fetching tenant list:", error);
@@ -70,7 +71,7 @@ const Dashboard = () => {
         <h1 className="text-4xl font-bold">Dashboard</h1>
         {role === userRole.SUPER_ADMIN && (
           <Dropdown
-            buttonText={selectedTenant || "Select Tenant"}
+            buttonText={selectedTenant.label || "Select Tenant"}
             items={tenants}
           />
         )}
